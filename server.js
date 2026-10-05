@@ -19,19 +19,15 @@ const SITE_CONFIG = {
     aiName: 'Zenuth AI',
     themeName: 'Liquid Glass Platform',
     defaultLimit: 100,                     // Batas limit per 24 jam
-    resetWindowMs: 24 * 60 * 60 * 1000,     // Durasi 24 jam dalam milidetik
-    maxLogsToKeep: 50                      // Batas maksimal simpan log error
+    resetWindowMs: 24 * 60 * 60 * 1000,     // Durasi 24 jam
+    maxLogsToKeep: 50                      // Batas simpan log error
 };
 
 // API Key Google Gemini
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AQ.Ab8RN6L3iwvouEq-l5shid2D11Y6XAPKzBn_mOT7QrEubSYJog';
 
-// Array Penyimpanan Log Error
 const errorLogs = [];
 
-/**
- * Fungsi untuk mencatat riwayat error ke sistem log
- */
 function recordErrorLog(endpoint, message, statusCode = 400) {
     const newLog = {
         id: 'LOG-' + Date.now().toString(36).toUpperCase(),
@@ -47,15 +43,11 @@ function recordErrorLog(endpoint, message, statusCode = 400) {
     }
 }
 
-// Middleware Express
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-/**
- * Fungsi untuk memuat database JSON lokal/sementara
- */
 function loadDB() {
     try {
         if (!fs.existsSync(DB_FILE)) {
@@ -69,21 +61,15 @@ function loadDB() {
     }
 }
 
-/**
- * Fungsi untuk menyimpan data ke file/memori
- */
 function saveDB(data) {
     memoryDB = data;
     try {
         fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
     } catch (err) {
-        // Fallback simpan di memori jika filesystem terisolasi
+        // Fallback simpan di memori
     }
 }
 
-/**
- * Middleware Rate Limiter & Auto Recovery Key
- */
 function checkRateLimit(req, res, next) {
     const apiKey = req.query.apikey || req.body.apikey;
 
@@ -95,7 +81,7 @@ function checkRateLimit(req, res, next) {
     const db = loadDB();
     let keyData = db.keys[apiKey];
 
-    // Auto-recovery key jika terhapus akibat cold start Vercel
+    // Pemulihan otomatis jika key SAW- terhapus dari memori serverless
     if (!keyData && apiKey.startsWith('SAW-')) {
         keyData = {
             key: apiKey,
@@ -115,13 +101,11 @@ function checkRateLimit(req, res, next) {
 
     const now = Date.now();
 
-    // Reset limit otomatis 24 jam
     if (now - keyData.lastReset >= SITE_CONFIG.resetWindowMs) {
         keyData.count = 0;
         keyData.lastReset = now;
     }
 
-    // Cek batas limit
     if (keyData.count >= keyData.limit) {
         const nextResetHours = Math.ceil((SITE_CONFIG.resetWindowMs - (now - keyData.lastReset)) / (1000 * 60 * 60));
         recordErrorLog(req.originalUrl, `Limit harian habis untuk key: ${apiKey}`, 429);
@@ -140,12 +124,10 @@ function checkRateLimit(req, res, next) {
 
 // 2. ROUTE DAN API ENDPOINTS
 
-// Halaman Utama Dokumentasi
 app.get('/', (req, res) => {
     res.render('docs', { config: SITE_CONFIG });
 });
 
-// Endpoint Buat API Key Baru
 app.post('/api/generate-key', (req, res) => {
     try {
         const db = loadDB();
@@ -167,7 +149,6 @@ app.post('/api/generate-key', (req, res) => {
     }
 });
 
-// Endpoint Cek Status API Key
 app.get('/api/check-key', (req, res) => {
     const { apikey } = req.query;
     if (!apikey) return res.json({ success: false, message: 'Parameter apikey diperlukan.' });
@@ -205,7 +186,7 @@ app.get('/api/check-key', (req, res) => {
     });
 });
 
-// Endpoint Utama Zenuth AI (Menggunakan Native Fetch HTTPS REST API)
+// Endpoint 1: Zenuth AI General Prompt
 app.get('/api/ai', checkRateLimit, async (req, res) => {
     const prompt = req.query.prompt;
 
@@ -215,7 +196,6 @@ app.get('/api/ai', checkRateLimit, async (req, res) => {
     }
 
     try {
-        // Pemanggilan Native REST API Gemini tanpa SDK
         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
         
         const response = await fetch(geminiUrl, {
@@ -229,13 +209,11 @@ app.get('/api/ai', checkRateLimit, async (req, res) => {
         const data = await response.json();
 
         if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
-            const aiReply = data.candidates[0].content.parts[0].text;
-
             return res.json({
                 success: true,
                 author: SITE_CONFIG.aiName,
                 prompt: prompt,
-                result: aiReply,
+                result: data.candidates[0].content.parts[0].text,
                 usage: {
                     usedToday: req.keyInfo.count,
                     remaining: req.keyInfo.limit - req.keyInfo.count,
@@ -245,23 +223,65 @@ app.get('/api/ai', checkRateLimit, async (req, res) => {
         } else {
             const errMsg = data.error ? data.error.message : 'Respons dari Gemini tidak valid.';
             recordErrorLog(req.originalUrl, errMsg, 500);
-            return res.status(500).json({ 
-                success: false, 
-                author: SITE_CONFIG.aiName, 
-                message: `Gagal memproses AI: ${errMsg}` 
-            });
+            return res.status(500).json({ success: false, author: SITE_CONFIG.aiName, message: `Gagal memproses AI: ${errMsg}` });
         }
     } catch (err) {
-        recordErrorLog(req.originalUrl, `Fetch Exception: ${err.message}`, 500);
-        return res.status(500).json({ 
-            success: false, 
-            author: SITE_CONFIG.aiName, 
-            message: `Gagal memproses AI: ${err.message}` 
-        });
+        recordErrorLog(req.originalUrl, err.message, 500);
+        return res.status(500).json({ success: false, author: SITE_CONFIG.aiName, message: `Gagal memproses AI: ${err.message}` });
     }
 });
 
-// Endpoint Ambil Daftar Error Logs
+// Endpoint 2: AI Translator (/api/translate)
+app.get('/api/translate', checkRateLimit, async (req, res) => {
+    const { text, to } = req.query;
+
+    if (!text || text.trim() === '') {
+        recordErrorLog(req.originalUrl, 'Parameter text kosong pada translator', 400);
+        return res.status(400).json({ success: false, message: 'Parameter text tidak boleh kosong!' });
+    }
+
+    const targetLang = to || 'en'; // Default ke bahasa Inggris jika tidak diisi
+    const systemPrompt = `Kamu adalah penerjemah profesional. Terjemahkan teks berikut ke bahasa "${targetLang}" secara alami dan akurat. Hanya berikan hasil terjemahannya saja tanpa penjelasan tambahan:\n\n"${text}"`;
+
+    try {
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+        
+        const response = await fetch(geminiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: systemPrompt }] }]
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
+            const translatedText = data.candidates[0].content.parts[0].text.trim();
+
+            return res.json({
+                success: true,
+                author: SITE_CONFIG.aiName,
+                originalText: text,
+                targetLanguage: targetLang,
+                result: translatedText,
+                usage: {
+                    usedToday: req.keyInfo.count,
+                    remaining: req.keyInfo.limit - req.keyInfo.count,
+                    limit: req.keyInfo.limit
+                }
+            });
+        } else {
+            const errMsg = data.error ? data.error.message : 'Respons dari Gemini tidak valid.';
+            recordErrorLog(req.originalUrl, errMsg, 500);
+            return res.status(500).json({ success: false, author: SITE_CONFIG.aiName, message: `Gagal menerjemahkan: ${errMsg}` });
+        }
+    } catch (err) {
+        recordErrorLog(req.originalUrl, err.message, 500);
+        return res.status(500).json({ success: false, author: SITE_CONFIG.aiName, message: `Gagal menerjemahkan: ${err.message}` });
+    }
+});
+
 app.get('/api/logs', (req, res) => {
     return res.json({ success: true, totalLogs: errorLogs.length, logs: errorLogs });
 });
