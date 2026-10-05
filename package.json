@@ -1,7 +1,7 @@
 {
   "name": "zenuth-ai-engine",
   "version": "3.0.0",
-  "description": "Rest API Platform Zenuth AI berdaya SDK Google Gen AI dengan Tema Liquid Glass Saweria",
+  "description": "Rest API Platform Zenuth AI berdaya Native REST API dengan Tema Liquid Glass Saweria",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -10,14 +10,12 @@
     "express",
     "ejs",
     "zenuth-ai",
-    "google-genai",
     "liquid-glass",
     "rest-api"
   ],
   "author": "Ramzyy",
   "license": "MIT",
   "dependencies": {
-    "@google/genai": "^0.1.0",
     "ejs": "^3.1.10",
     "express": "^4.19.2"
   }
