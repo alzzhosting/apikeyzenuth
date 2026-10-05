@@ -1,0 +1,23 @@
+{
+  "name": "zenuth-ai-engine",
+  "version": "2.5.0",
+  "description": "Rest API Platform Zenuth AI berdaya Google Gemini dengan Tema Liquid Glass",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "express",
+    "ejs",
+    "zenuth-ai",
+    "gemini-ai",
+    "liquid-glass",
+    "rest-api"
+  ],
+  "author": "Ramzyy",
+  "license": "MIT",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.19.2"
+  }
+}
