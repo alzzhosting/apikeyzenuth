@@ -2,37 +2,33 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
+const { GoogleGenAI } = require('@google/genai');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Penanganan lokasi database sementara di Vercel
+// Penanganan lokasi database sementara di Vercel Serverless
 const DB_FILE = process.env.VERCEL 
     ? path.join('/tmp', 'database.json') 
     : path.join(__dirname, 'database.json');
 
 let memoryDB = { keys: {} };
 
-// Pengaturan Terpusat Aplikasi
+// 1. PENGATURAN TERPUSAT APLIKASI
 const SITE_CONFIG = {
     siteName: 'Zenuth AI Engine',
     aiName: 'Zenuth AI',
     themeName: 'Liquid Glass Platform',
     defaultLimit: 100,                     // Batas limit per 24 jam
-    resetWindowMs: 24 * 60 * 60 * 1000,     // Durasi 24 jam
-    maxLogsToKeep: 50                      // Batas simpan log error
+    resetWindowMs: 24 * 60 * 60 * 1000,     // Durasi 24 jam dalam milidetik
+    maxLogsToKeep: 50                      // Batas maksimal simpan log error
 };
 
-// API Key Google Gemini
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AQ.Ab8RN6L3iwvouEq-l5shid2D11Y6XAPKzBn_mOT7QrEubSYJog';
+// Inisialisasi SDK Google Gen AI
+const GEMINI_KEY = process.env.GEMINI_API_KEY || 'AQ.Ab8RN6L3iwvouEq-l5shid2D11Y6XAPKzBn_mOT7QrEubSYJog';
+const ai = new GoogleGenAI({ apiKey: GEMINI_KEY });
 
-// Daftar Model Resmi yang Valid di v1beta
-const GEMINI_MODELS = [
-    'gemini-1.5-flash',
-    'gemini-1.5-flash-8b',
-    'gemini-1.5-pro-latest'
-];
-
+// Array Penyimpanan Log Error
 const errorLogs = [];
 
 /**
@@ -53,11 +49,15 @@ function recordErrorLog(endpoint, message, statusCode = 400) {
     }
 }
 
+// Middleware Express
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
+/**
+ * Fungsi untuk memuat database JSON lokal/sementara
+ */
 function loadDB() {
     try {
         if (!fs.existsSync(DB_FILE)) {
@@ -71,6 +71,9 @@ function loadDB() {
     }
 }
 
+/**
+ * Fungsi untuk menyimpan data ke file/memori
+ */
 function saveDB(data) {
     memoryDB = data;
     try {
@@ -94,7 +97,7 @@ function checkRateLimit(req, res, next) {
     const db = loadDB();
     let keyData = db.keys[apiKey];
 
-    // Pemulihan otomatis jika key SAW- terhapus dari memori serverless
+    // Auto-recovery key jika terhapus akibat cold start Vercel
     if (!keyData && apiKey.startsWith('SAW-')) {
         keyData = {
             key: apiKey,
@@ -137,10 +140,14 @@ function checkRateLimit(req, res, next) {
     next();
 }
 
+// 2. ROUTE DAN API ENDPOINTS
+
+// Halaman Utama Dokumentasi
 app.get('/', (req, res) => {
     res.render('docs', { config: SITE_CONFIG });
 });
 
+// Endpoint Buat API Key Baru
 app.post('/api/generate-key', (req, res) => {
     try {
         const db = loadDB();
@@ -162,6 +169,7 @@ app.post('/api/generate-key', (req, res) => {
     }
 });
 
+// Endpoint Cek Status API Key
 app.get('/api/check-key', (req, res) => {
     const { apikey } = req.query;
     if (!apikey) return res.json({ success: false, message: 'Parameter apikey diperlukan.' });
@@ -199,7 +207,7 @@ app.get('/api/check-key', (req, res) => {
     });
 });
 
-// Endpoint Utama AI dengan Fallback Model Valid
+// Endpoint Utama Zenuth AI (Menggunakan SDK @google/genai)
 app.get('/api/ai', checkRateLimit, async (req, res) => {
     const prompt = req.query.prompt;
 
@@ -208,63 +216,48 @@ app.get('/api/ai', checkRateLimit, async (req, res) => {
         return res.status(400).json({ success: false, message: 'Parameter prompt tidak boleh kosong!' });
     }
 
-    let aiReply = null;
-    let lastErrorMessage = 'Tidak ada respons valid dari seluruh model.';
-
-    // Mencoba model secara berurutan
-    for (const model of GEMINI_MODELS) {
-        try {
-            const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
-            
-            const response = await fetch(geminiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }]
-                })
-            });
-
-            const data = await response.json();
-
-            if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
-                aiReply = data.candidates[0].content.parts[0].text;
-                break; // Keluar dari perulangan jika berhasil
-            } else if (data.error) {
-                lastErrorMessage = `Model ${model}: ${data.error.message}`;
-            }
-        } catch (err) {
-            lastErrorMessage = `Model ${model} Exception: ${err.message}`;
-        }
-    }
-
-    if (aiReply) {
-        return res.json({
-            success: true,
-            author: SITE_CONFIG.aiName,
-            prompt: prompt,
-            result: aiReply,
-            usage: {
-                usedToday: req.keyInfo.count,
-                remaining: req.keyInfo.limit - req.keyInfo.count,
-                limit: req.keyInfo.limit
-            }
+    try {
+        // Memanggil SDK @google/genai
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
         });
-    } else {
-        recordErrorLog(req.originalUrl, lastErrorMessage, 500);
-        return res.status(500).json({
-            success: false,
-            author: SITE_CONFIG.aiName,
-            message: `Gagal memproses AI: Server sedang padat. Silakan coba beberapa saat lagi.`
+
+        if (response && response.text) {
+            return res.json({
+                success: true,
+                author: SITE_CONFIG.aiName,
+                prompt: prompt,
+                result: response.text,
+                usage: {
+                    usedToday: req.keyInfo.count,
+                    remaining: req.keyInfo.limit - req.keyInfo.count,
+                    limit: req.keyInfo.limit
+                }
+            });
+        } else {
+            recordErrorLog(req.originalUrl, 'Respons kosong dari SDK GenAI', 500);
+            return res.status(500).json({ success: false, author: SITE_CONFIG.aiName, message: 'Gagal memperoleh jawaban dari AI.' });
+        }
+    } catch (err) {
+        recordErrorLog(req.originalUrl, `GenAI Exception: ${err.message}`, 500);
+        return res.status(500).json({ 
+            success: false, 
+            author: SITE_CONFIG.aiName, 
+            message: `Gagal memproses AI: ${err.message}` 
         });
     }
 });
 
+// Endpoint Ambil Daftar Error Logs
 app.get('/api/logs', (req, res) => {
     return res.json({ success: true, totalLogs: errorLogs.length, logs: errorLogs });
 });
 
 app.listen(PORT, () => {
-    console.log(`Server aktif di http://localhost:${PORT}`);
+    console.log(`=================================================`);
+    console.log(`${SITE_CONFIG.siteName} Aktif di: http://localhost:${PORT}`);
+    console.log(`=================================================`);
 });
 
 module.exports = app;
