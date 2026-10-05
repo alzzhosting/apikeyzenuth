@@ -23,7 +23,7 @@ const SITE_CONFIG = {
     maxLogsToKeep: 50                      // Batas simpan log error
 };
 
-// API Key Google Gemini
+// API Key Google Gemini untuk Endpoint AI
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AQ.Ab8RN6L3iwvouEq-l5shid2D11Y6XAPKzBn_mOT7QrEubSYJog';
 
 const errorLogs = [];
@@ -186,7 +186,7 @@ app.get('/api/check-key', (req, res) => {
     });
 });
 
-// Endpoint 1: Zenuth AI General Prompt
+// Endpoint 1: Zenuth AI General Prompt (Memakai Gemini API)
 app.get('/api/ai', checkRateLimit, async (req, res) => {
     const prompt = req.query.prompt;
 
@@ -231,7 +231,7 @@ app.get('/api/ai', checkRateLimit, async (req, res) => {
     }
 });
 
-// Endpoint 2: AI Translator (/api/translate)
+// Endpoint 2: Fast Translate (Menggunakan Google Translate GTX API)
 app.get('/api/translate', checkRateLimit, async (req, res) => {
     const { text, to } = req.query;
 
@@ -240,28 +240,22 @@ app.get('/api/translate', checkRateLimit, async (req, res) => {
         return res.status(400).json({ success: false, message: 'Parameter text tidak boleh kosong!' });
     }
 
-    const targetLang = to || 'en'; // Default ke bahasa Inggris jika tidak diisi
-    const systemPrompt = `Kamu adalah penerjemah profesional. Terjemahkan teks berikut ke bahasa "${targetLang}" secara alami dan akurat. Hanya berikan hasil terjemahannya saja tanpa penjelasan tambahan:\n\n"${text}"`;
+    const targetLang = to || 'en'; // Kode bahasa tujuan (contoh: en, ja, id, ko)
 
     try {
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-        
-        const response = await fetch(geminiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: systemPrompt }] }]
-            })
-        });
+        // Menggunakan Endpoint GTX Google Translate Gratis
+        const gtxUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${encodeURIComponent(targetLang)}&dt=t&q=${encodeURIComponent(text)}`;
 
+        const response = await fetch(gtxUrl);
         const data = await response.json();
 
-        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
-            const translatedText = data.candidates[0].content.parts[0].text.trim();
+        if (data && data[0]) {
+            // Menggabungkan potongan terjemahan jika kalimat panjang
+            const translatedText = data[0].map(item => item[0]).filter(Boolean).join('');
 
             return res.json({
                 success: true,
-                author: SITE_CONFIG.aiName,
+                author: SITE_CONFIG.siteName,
                 originalText: text,
                 targetLanguage: targetLang,
                 result: translatedText,
@@ -272,13 +266,12 @@ app.get('/api/translate', checkRateLimit, async (req, res) => {
                 }
             });
         } else {
-            const errMsg = data.error ? data.error.message : 'Respons dari Gemini tidak valid.';
-            recordErrorLog(req.originalUrl, errMsg, 500);
-            return res.status(500).json({ success: false, author: SITE_CONFIG.aiName, message: `Gagal menerjemahkan: ${errMsg}` });
+            recordErrorLog(req.originalUrl, 'Gagal mengambil data dari Google Translate GTX', 500);
+            return res.status(500).json({ success: false, message: 'Gagal memproses terjemahan.' });
         }
     } catch (err) {
         recordErrorLog(req.originalUrl, err.message, 500);
-        return res.status(500).json({ success: false, author: SITE_CONFIG.aiName, message: `Gagal menerjemahkan: ${err.message}` });
+        return res.status(500).json({ success: false, message: `Gagal memproses terjemahan: ${err.message}` });
     }
 });
 
