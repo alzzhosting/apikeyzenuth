@@ -57,10 +57,8 @@
 </head>
 <body class="font-sans text-stone-200 min-h-screen flex flex-col justify-between p-4 sm:p-8">
 
-    <!-- OVERLAY SIDEBAR -->
     <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
 
-    <!-- SIDEBAR NAVIGASI HAMBURGER -->
     <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-stone-950/95 border-r border-amber-500/20 z-50 transform -translate-x-full p-6 flex flex-col justify-between shadow-2xl liquid-glass">
         <div>
             <div class="flex items-center justify-between pb-6 border-b border-stone-800">
@@ -93,10 +91,8 @@
         </div>
     </aside>
 
-    <!-- CONTAINER UTAMA -->
     <div class="max-w-5xl mx-auto w-full space-y-8">
         
-        <!-- TOPBAR HEADER -->
         <header class="flex items-center justify-between liquid-glass p-5 rounded-3xl">
             <div class="flex items-center gap-4">
                 <button onclick="toggleSidebar()" class="p-3 bg-stone-900 hover:bg-stone-800 border border-amber-500/30 text-amber-400 rounded-2xl transition flex items-center gap-2">
@@ -116,14 +112,14 @@
             </div>
         </header>
 
-        <!-- TAB 1: DOKUMENTASI API ACCORDION -->
+        <!-- TAB 1: DOKUMENTASI API -->
         <div id="tab-docs" class="space-y-6">
             <div class="liquid-glass p-6 sm:p-8 rounded-3xl space-y-6">
                 <div>
                     <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-cubes text-amber-400"></i> Daftar Endpoint API
+                        <i class="fa-solid fa-cubes text-amber-400"></i> Daftar Endpoint & Contoh Integrasi
                     </h2>
-                    <p class="text-stone-400 text-xs sm:text-sm mt-1">Klik pada nama endpoint untuk membakar/membuka detail parameter dan kolom uji coba.</p>
+                    <p class="text-stone-400 text-xs sm:text-sm mt-1">Klik pada nama endpoint untuk melihat parameter, uji coba langsung, dan contoh salinan kode bot.</p>
                 </div>
 
                 <!-- ENDPOINT 1: ZENUTH AI -->
@@ -137,7 +133,7 @@
                         <i id="accordion-icon-ai" class="fa-solid fa-chevron-right text-amber-400 text-sm transition-transform duration-300"></i>
                     </button>
 
-                    <div id="accordion-content-ai" class="hidden p-5 border-t border-stone-800/80 space-y-4 bg-stone-950/40">
+                    <div id="accordion-content-ai" class="hidden p-5 border-t border-stone-800/80 space-y-6 bg-stone-950/40">
                         <div class="space-y-2">
                             <span class="text-xs font-bold uppercase tracking-wider text-stone-400 block">Parameter Request</span>
                             <div class="overflow-x-auto">
@@ -163,6 +159,7 @@
                             </div>
                         </div>
 
+                        <!-- PLAYGROUND TEST -->
                         <div class="pt-4 border-t border-stone-800/80 space-y-3">
                             <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Uji Coba Langsung <%= config.aiName %></span>
                             <div class="flex flex-col sm:flex-row gap-2">
@@ -176,10 +173,63 @@
                                 <pre id="test-result-json-ai">// Jawaban AI muncul di sini</pre>
                             </div>
                         </div>
+
+                        <!-- INTEGRATION CODE SNIPPETS (CONTOH SALINAN KODE BOT) -->
+                        <div class="pt-4 border-t border-stone-800/80 space-y-4">
+                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Contoh Kode Integrasi Bot</span>
+                            
+                            <!-- cURL -->
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between items-center text-xs font-mono text-stone-400">
+                                    <span>cURL</span>
+                                    <button onclick="copyCode('code-curl-ai', this)" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
+                                        <i class="fa-solid fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <div class="p-3 bg-stone-950 rounded-xl border border-stone-800/80 font-mono text-xs text-emerald-400 overflow-x-auto">
+                                    <pre id="code-curl-ai">curl "https://apikeyzenuth.vercel.app/api/ai?apikey=YOUR_API_KEY&prompt=halo"</pre>
+                                </div>
+                            </div>
+
+                            <!-- JavaScript Fetch -->
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between items-center text-xs font-mono text-stone-400">
+                                    <span>JavaScript (Fetch)</span>
+                                    <button onclick="copyCode('code-js-ai', this)" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
+                                        <i class="fa-solid fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <div class="p-3 bg-stone-950 rounded-xl border border-stone-800/80 font-mono text-xs text-emerald-400 overflow-x-auto">
+                                    <pre id="code-js-ai">const res = await fetch('https://apikeyzenuth.vercel.app/api/ai?apikey=YOUR_API_KEY&prompt=halo');
+const data = await res.json();
+console.log(data.result);</pre>
+                                </div>
+                            </div>
+
+                            <!-- Python requests -->
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between items-center text-xs font-mono text-stone-400">
+                                    <span>Python (requests)</span>
+                                    <button onclick="copyCode('code-py-ai', this)" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
+                                        <i class="fa-solid fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <div class="p-3 bg-stone-950 rounded-xl border border-stone-800/80 font-mono text-xs text-emerald-400 overflow-x-auto">
+                                    <pre id="code-py-ai">import requests
+
+response = requests.get('https://apikeyzenuth.vercel.app/api/ai', params={
+    'apikey': 'YOUR_API_KEY',
+    'prompt': 'halo'
+})
+print(response.json()['result'])</pre>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
-                <!-- ENDPOINT 2: TRANSLATOR (GTX GOOGLE TRANSLATE) -->
+                <!-- ENDPOINT 2: TRANSLATOR -->
                 <div class="rounded-2xl bg-stone-950/60 border border-stone-800 overflow-hidden">
                     <button onclick="toggleAccordion('translate')" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-stone-900/60 transition text-left">
                         <div class="flex items-center gap-3 font-mono text-xs sm:text-sm">
@@ -190,7 +240,7 @@
                         <i id="accordion-icon-translate" class="fa-solid fa-chevron-right text-amber-400 text-sm transition-transform duration-300"></i>
                     </button>
 
-                    <div id="accordion-content-translate" class="hidden p-5 border-t border-stone-800/80 space-y-4 bg-stone-950/40">
+                    <div id="accordion-content-translate" class="hidden p-5 border-t border-stone-800/80 space-y-6 bg-stone-950/40">
                         <div class="space-y-2">
                             <span class="text-xs font-bold uppercase tracking-wider text-stone-400 block">Parameter Request</span>
                             <div class="overflow-x-auto">
@@ -215,7 +265,7 @@
                                             <td class="p-2.5 text-amber-400 font-bold">to</td>
                                             <td class="p-2.5">String</td>
                                             <td class="p-2.5 text-amber-400">Opsional</td>
-                                            <td class="p-2.5">Kode bahasa tujuan (contoh: en, ja, id, ko, ar, jw). Default: en.</td>
+                                            <td class="p-2.5">Kode bahasa tujuan (contoh: en, ja, id, ko). Default: en.</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -246,6 +296,60 @@
                                 <pre id="test-result-json-trans">// Hasil Terjemahan muncul di sini</pre>
                             </div>
                         </div>
+
+                        <!-- INTEGRATION CODE SNIPPETS TRANSLATOR -->
+                        <div class="pt-4 border-t border-stone-800/80 space-y-4">
+                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Contoh Kode Integrasi Bot</span>
+                            
+                            <!-- cURL -->
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between items-center text-xs font-mono text-stone-400">
+                                    <span>cURL</span>
+                                    <button onclick="copyCode('code-curl-trans', this)" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
+                                        <i class="fa-solid fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <div class="p-3 bg-stone-950 rounded-xl border border-stone-800/80 font-mono text-xs text-emerald-400 overflow-x-auto">
+                                    <pre id="code-curl-trans">curl "https://apikeyzenuth.vercel.app/api/translate?apikey=YOUR_API_KEY&text=Selamat%20pagi&to=en"</pre>
+                                </div>
+                            </div>
+
+                            <!-- JavaScript Fetch -->
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between items-center text-xs font-mono text-stone-400">
+                                    <span>JavaScript (Fetch)</span>
+                                    <button onclick="copyCode('code-js-trans', this)" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
+                                        <i class="fa-solid fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <div class="p-3 bg-stone-950 rounded-xl border border-stone-800/80 font-mono text-xs text-emerald-400 overflow-x-auto">
+                                    <pre id="code-js-trans">const res = await fetch('https://apikeyzenuth.vercel.app/api/translate?apikey=YOUR_API_KEY&text=Selamat%20pagi&to=en');
+const data = await res.json();
+console.log(data.result);</pre>
+                                </div>
+                            </div>
+
+                            <!-- Python requests -->
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between items-center text-xs font-mono text-stone-400">
+                                    <span>Python (requests)</span>
+                                    <button onclick="copyCode('code-py-trans', this)" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
+                                        <i class="fa-solid fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <div class="p-3 bg-stone-950 rounded-xl border border-stone-800/80 font-mono text-xs text-emerald-400 overflow-x-auto">
+                                    <pre id="code-py-trans">import requests
+
+response = requests.get('https://apikeyzenuth.vercel.app/api/translate', params={
+    'apikey': 'YOUR_API_KEY',
+    'text': 'Selamat pagi',
+    'to': 'en'
+})
+print(response.json()['result'])</pre>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
@@ -324,12 +428,10 @@
 
     </div>
 
-    <!-- FOOTER -->
     <footer class="text-center text-stone-500 text-xs mt-12 py-4">
         <%= config.siteName %> &bull; Theme Liquid Glass Saweria
     </footer>
 
-    <!-- CLIENT SCRIPT -->
     <script>
         let currentApiKey = localStorage.getItem('saw_api_key') || '';
 
@@ -365,6 +467,17 @@
 
             if (tabName === 'logs') fetchErrorLogs();
             toggleSidebar();
+        }
+
+        function copyCode(elementId, btnElement) {
+            const codeText = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(codeText).then(() => {
+                const originalText = btnElement.innerHTML;
+                btnElement.innerHTML = '<i class="fa-solid fa-check text-emerald-400"></i> Copied!';
+                setTimeout(() => {
+                    btnElement.innerHTML = originalText;
+                }, 2000);
+            });
         }
 
         async function generateApiKey() {
