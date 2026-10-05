@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= config.siteName %> &bull; <%= config.aiName %></title>
+    <title><%= config.siteName %></title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -57,8 +57,10 @@
 </head>
 <body class="font-sans text-stone-200 min-h-screen flex flex-col justify-between p-4 sm:p-8">
 
+    <!-- OVERLAY SIDEBAR -->
     <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
 
+    <!-- SIDEBAR NAVIGASI HAMBURGER -->
     <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-stone-950/95 border-r border-amber-500/20 z-50 transform -translate-x-full p-6 flex flex-col justify-between shadow-2xl liquid-glass">
         <div>
             <div class="flex items-center justify-between pb-6 border-b border-stone-800">
@@ -91,8 +93,10 @@
         </div>
     </aside>
 
+    <!-- CONTAINER UTAMA -->
     <div class="max-w-5xl mx-auto w-full space-y-8">
         
+        <!-- TOPBAR HEADER -->
         <header class="flex items-center justify-between liquid-glass p-5 rounded-3xl">
             <div class="flex items-center gap-4">
                 <button onclick="toggleSidebar()" class="p-3 bg-stone-900 hover:bg-stone-800 border border-amber-500/30 text-amber-400 rounded-2xl transition flex items-center gap-2">
@@ -122,13 +126,13 @@
                     <p class="text-stone-400 text-xs sm:text-sm mt-1">Klik pada nama endpoint untuk melihat parameter, uji coba langsung, dan contoh salinan kode bot.</p>
                 </div>
 
-                <!-- ENDPOINT 1: ZENUTH AI -->
+                <!-- ENDPOINT 1: AI PROMPT -->
                 <div class="rounded-2xl bg-stone-950/60 border border-stone-800 overflow-hidden">
                     <button onclick="toggleAccordion('ai')" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-stone-900/60 transition text-left">
                         <div class="flex items-center gap-3 font-mono text-xs sm:text-sm">
                             <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">GET</span>
                             <span class="text-white font-bold">/api/ai</span>
-                            <span class="text-stone-400 text-xs hidden sm:inline">- <%= config.aiName %> Engine</span>
+                            <span class="text-stone-400 text-xs hidden sm:inline">- <%= config.siteName %> AI Engine</span>
                         </div>
                         <i id="accordion-icon-ai" class="fa-solid fa-chevron-right text-amber-400 text-sm transition-transform duration-300"></i>
                     </button>
@@ -152,7 +156,7 @@
                                             <td class="p-2.5 text-amber-400 font-bold">prompt</td>
                                             <td class="p-2.5">String</td>
                                             <td class="p-2.5 text-emerald-400">Ya</td>
-                                            <td class="p-2.5">Pertanyaan atau instruksi untuk <%= config.aiName %>.</td>
+                                            <td class="p-2.5">Pertanyaan atau instruksi untuk AI.</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -161,7 +165,7 @@
 
                         <!-- PLAYGROUND TEST -->
                         <div class="pt-4 border-t border-stone-800/80 space-y-3">
-                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Uji Coba Langsung <%= config.aiName %></span>
+                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Uji Coba Langsung AI</span>
                             <div class="flex flex-col sm:flex-row gap-2">
                                 <input type="text" id="test-prompt-ai" placeholder="Tanya sesuatu..." class="w-full bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500 font-mono">
                                 <button onclick="testAiApi()" class="px-5 py-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 whitespace-nowrap">
@@ -174,11 +178,10 @@
                             </div>
                         </div>
 
-                        <!-- INTEGRATION CODE SNIPPETS (CONTOH SALINAN KODE BOT) -->
+                        <!-- INTEGRATION CODE SNIPPETS -->
                         <div class="pt-4 border-t border-stone-800/80 space-y-4">
                             <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Contoh Kode Integrasi Bot</span>
                             
-                            <!-- cURL -->
                             <div class="space-y-1.5">
                                 <div class="flex justify-between items-center text-xs font-mono text-stone-400">
                                     <span>cURL</span>
@@ -191,7 +194,6 @@
                                 </div>
                             </div>
 
-                            <!-- JavaScript Fetch -->
                             <div class="space-y-1.5">
                                 <div class="flex justify-between items-center text-xs font-mono text-stone-400">
                                     <span>JavaScript (Fetch)</span>
@@ -206,7 +208,6 @@ console.log(data.result);</pre>
                                 </div>
                             </div>
 
-                            <!-- Python requests -->
                             <div class="space-y-1.5">
                                 <div class="flex justify-between items-center text-xs font-mono text-stone-400">
                                     <span>Python (requests)</span>
@@ -297,11 +298,10 @@ print(response.json()['result'])</pre>
                             </div>
                         </div>
 
-                        <!-- INTEGRATION CODE SNIPPETS TRANSLATOR -->
+                        <!-- CODE SNIPPETS TRANSLATOR -->
                         <div class="pt-4 border-t border-stone-800/80 space-y-4">
                             <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Contoh Kode Integrasi Bot</span>
                             
-                            <!-- cURL -->
                             <div class="space-y-1.5">
                                 <div class="flex justify-between items-center text-xs font-mono text-stone-400">
                                     <span>cURL</span>
@@ -314,7 +314,6 @@ print(response.json()['result'])</pre>
                                 </div>
                             </div>
 
-                            <!-- JavaScript Fetch -->
                             <div class="space-y-1.5">
                                 <div class="flex justify-between items-center text-xs font-mono text-stone-400">
                                     <span>JavaScript (Fetch)</span>
@@ -329,7 +328,6 @@ console.log(data.result);</pre>
                                 </div>
                             </div>
 
-                            <!-- Python requests -->
                             <div class="space-y-1.5">
                                 <div class="flex justify-between items-center text-xs font-mono text-stone-400">
                                     <span>Python (requests)</span>
@@ -344,6 +342,110 @@ response = requests.get('https://apikeyzenuth.vercel.app/api/translate', params=
     'apikey': 'YOUR_API_KEY',
     'text': 'Selamat pagi',
     'to': 'en'
+})
+print(response.json()['result'])</pre>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ENDPOINT 3: SHORTLINK BYPASS -->
+                <div class="rounded-2xl bg-stone-950/60 border border-stone-800 overflow-hidden">
+                    <button onclick="toggleAccordion('bypass')" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-stone-900/60 transition text-left">
+                        <div class="flex items-center gap-3 font-mono text-xs sm:text-sm">
+                            <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">GET</span>
+                            <span class="text-white font-bold">/api/bypass</span>
+                            <span class="text-stone-400 text-xs hidden sm:inline">- Shortlink Bypass Engine</span>
+                        </div>
+                        <i id="accordion-icon-bypass" class="fa-solid fa-chevron-right text-amber-400 text-sm transition-transform duration-300"></i>
+                    </button>
+
+                    <div id="accordion-content-bypass" class="hidden p-5 border-t border-stone-800/80 space-y-6 bg-stone-950/40">
+                        <div class="space-y-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-stone-400 block">Parameter Request</span>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs font-mono">
+                                    <thead class="bg-stone-900 text-stone-400 border-b border-stone-800">
+                                        <tr><th class="p-2.5">Parameter</th><th class="p-2.5">Tipe</th><th class="p-2.5">Wajib</th><th class="p-2.5">Keterangan</th></tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-stone-800/60 text-stone-300">
+                                        <tr>
+                                            <td class="p-2.5 text-amber-400 font-bold">apikey</td>
+                                            <td class="p-2.5">String</td>
+                                            <td class="p-2.5 text-emerald-400">Ya</td>
+                                            <td class="p-2.5">Kunci API milikmu.</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-2.5 text-amber-400 font-bold">url</td>
+                                            <td class="p-2.5">String</td>
+                                            <td class="p-2.5 text-emerald-400">Ya</td>
+                                            <td class="p-2.5">Tautan shortlink target yang ingin di-bypass (contoh: https://sfl.gl/xxx).</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- PLAYGROUND BYPASS -->
+                        <div class="pt-4 border-t border-stone-800/80 space-y-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Uji Coba Langsung Bypass</span>
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <input type="text" id="test-url-bypass" placeholder="URL Shortlink (contoh: https://sfl.gl/xxx)" class="w-full bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500 font-mono">
+                                <button onclick="testBypassApi()" class="px-5 py-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 whitespace-nowrap">
+                                    <i class="fa-solid fa-link-slash"></i> Bypass URL
+                                </button>
+                            </div>
+
+                            <div id="test-result-box-bypass" class="hidden p-4 bg-stone-950 rounded-xl border border-stone-800 font-mono text-xs text-emerald-400 overflow-x-auto">
+                                <pre id="test-result-json-bypass">// Hasil URL Bypass muncul di sini</pre>
+                            </div>
+                        </div>
+
+                        <!-- CODE SNIPPETS BYPASS -->
+                        <div class="pt-4 border-t border-stone-800/80 space-y-4">
+                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Contoh Kode Integrasi Bot</span>
+                            
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between items-center text-xs font-mono text-stone-400">
+                                    <span>cURL</span>
+                                    <button onclick="copyCode('code-curl-bypass', this)" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
+                                        <i class="fa-solid fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <div class="p-3 bg-stone-950 rounded-xl border border-stone-800/80 font-mono text-xs text-emerald-400 overflow-x-auto">
+                                    <pre id="code-curl-bypass">curl "https://apikeyzenuth.vercel.app/api/bypass?apikey=YOUR_API_KEY&url=https://sfl.gl/xxx"</pre>
+                                </div>
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between items-center text-xs font-mono text-stone-400">
+                                    <span>JavaScript (Fetch)</span>
+                                    <button onclick="copyCode('code-js-bypass', this)" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
+                                        <i class="fa-solid fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <div class="p-3 bg-stone-950 rounded-xl border border-stone-800/80 font-mono text-xs text-emerald-400 overflow-x-auto">
+                                    <pre id="code-js-bypass">const res = await fetch('https://apikeyzenuth.vercel.app/api/bypass?apikey=YOUR_API_KEY&url=https://sfl.gl/xxx');
+const data = await res.json();
+console.log(data.result);</pre>
+                                </div>
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between items-center text-xs font-mono text-stone-400">
+                                    <span>Python (requests)</span>
+                                    <button onclick="copyCode('code-py-bypass', this)" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
+                                        <i class="fa-solid fa-copy"></i> Copy
+                                    </button>
+                                </div>
+                                <div class="p-3 bg-stone-950 rounded-xl border border-stone-800/80 font-mono text-xs text-emerald-400 overflow-x-auto">
+                                    <pre id="code-py-bypass">import requests
+
+response = requests.get('https://apikeyzenuth.vercel.app/api/bypass', params={
+    'apikey': 'YOUR_API_KEY',
+    'url': 'https://sfl.gl/xxx'
 })
 print(response.json()['result'])</pre>
                                 </div>
@@ -429,7 +531,7 @@ print(response.json()['result'])</pre>
     </div>
 
     <footer class="text-center text-stone-500 text-xs mt-12 py-4">
-        <%= config.siteName %> &bull; Theme Liquid Glass Saweria
+        <%= config.siteName %> &bull; Theme Liquid Glass
     </footer>
 
     <script>
@@ -530,7 +632,7 @@ print(response.json()['result'])</pre>
             const resultJson = document.getElementById('test-result-json-ai');
 
             resultBox.classList.remove('hidden');
-            resultJson.innerText = 'Zenuth AI sedang berpikir...';
+            resultJson.innerText = 'apikeyzenuth AI sedang berpikir...';
 
             try {
                 const res = await fetch(`/api/ai?apikey=${currentApiKey}&prompt=${encodeURIComponent(prompt)}`);
@@ -569,6 +671,35 @@ print(response.json()['result'])</pre>
                 checkKeyStatus(currentApiKey);
             } catch (err) {
                 resultJson.innerText = 'Error: Gagal terhubung ke Translator Engine.';
+            }
+        }
+
+        async function testBypassApi() {
+            if (!currentApiKey) {
+                alert('Silakan buat API Key di menu Pengaturan terlebih dahulu!');
+                return;
+            }
+
+            const url = document.getElementById('test-url-bypass').value.trim();
+
+            if (!url) {
+                alert('Masukkan URL shortlink terlebih dahulu!');
+                return;
+            }
+
+            const resultBox = document.getElementById('test-result-box-bypass');
+            const resultJson = document.getElementById('test-result-json-bypass');
+
+            resultBox.classList.remove('hidden');
+            resultJson.innerText = 'Memproses bypass URL...';
+
+            try {
+                const res = await fetch(`/api/bypass?apikey=${currentApiKey}&url=${encodeURIComponent(url)}`);
+                const data = await res.json();
+                resultJson.innerText = JSON.stringify(data, null, 2);
+                checkKeyStatus(currentApiKey);
+            } catch (err) {
+                resultJson.innerText = 'Error: Gagal terhubung ke Bypass Engine.';
             }
         }
 
