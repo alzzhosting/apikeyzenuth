@@ -6,12 +6,11 @@ const crypto = require('crypto');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Menentukan lokasi penyimpanan sementara yang aman untuk Vercel
+// Penanganan lokasi database sementara di Vercel
 const DB_FILE = process.env.VERCEL 
     ? path.join('/tmp', 'database.json') 
     : path.join(__dirname, 'database.json');
 
-// Penyimpanan cadangan di memori server
 let memoryDB = { keys: {} };
 
 // Pengaturan Terpusat Aplikasi
@@ -19,19 +18,18 @@ const SITE_CONFIG = {
     siteName: 'Zenuth AI Engine',
     aiName: 'Zenuth AI',
     themeName: 'Liquid Glass Platform',
-    defaultLimit: 100,                     // Batas limit harian per API Key
-    resetWindowMs: 24 * 60 * 60 * 1000,     // Durasi reset 24 jam
-    maxLogsToKeep: 50                      // Batas maksimal riwayat log error
+    defaultLimit: 100,                     // Limit request per 24 jam
+    resetWindowMs: 24 * 60 * 60 * 1000,     // Durasi 24 jam
+    maxLogsToKeep: 50                      // Batas maksimal simpan log error
 };
 
-// API Key Google Gemini (Menggunakan Key Baru Milikmu)
+// API Key Google Gemini
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AQ.Ab8RN6L3iwvouEq-l5shid2D11Y6XAPKzBn_mOT7QrEubSYJog';
 
-// Array Penyimpanan Log Error
 const errorLogs = [];
 
 /**
- * Fungsi untuk mencatat error ke dalam daftar log
+ * Fungsi untuk mencatat riwayat error ke sistem log
  */
 function recordErrorLog(endpoint, message, statusCode = 400) {
     const newLog = {
@@ -54,9 +52,6 @@ app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-/**
- * Fungsi untuk memuat database JSON
- */
 function loadDB() {
     try {
         if (!fs.existsSync(DB_FILE)) {
@@ -70,20 +65,17 @@ function loadDB() {
     }
 }
 
-/**
- * Fungsi untuk menyimpan database JSON
- */
 function saveDB(data) {
     memoryDB = data;
     try {
         fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
     } catch (err) {
-        // Cadangan penyimpanan di memori jika lokasi file tidak dapat diakses
+        // Fallback di memori jika filesystem terisolasi
     }
 }
 
 /**
- * Middleware untuk mengecek validitas API Key dan Limit 24 Jam
+ * Middleware Rate Limiter & Auto Recovery Key
  */
 function checkRateLimit(req, res, next) {
     const apiKey = req.query.apikey || req.body.apikey;
@@ -96,7 +88,7 @@ function checkRateLimit(req, res, next) {
     const db = loadDB();
     let keyData = db.keys[apiKey];
 
-    // SOLUSI ERROR 403: Auto-register jika key berformat SAW- terhapus akibat cold start Vercel
+    // Pemulihan otomatis jika key SAW- terhapus dari memori serverless
     if (!keyData && apiKey.startsWith('SAW-')) {
         keyData = {
             key: apiKey,
@@ -116,13 +108,13 @@ function checkRateLimit(req, res, next) {
 
     const now = Date.now();
 
-    // Reset otomatis jika sudah melewati 24 jam
+    // Reset limit otomatis 24 jam
     if (now - keyData.lastReset >= SITE_CONFIG.resetWindowMs) {
         keyData.count = 0;
         keyData.lastReset = now;
     }
 
-    // Cek apakah limit harian sudah habis
+    // Cek batas limit
     if (keyData.count >= keyData.limit) {
         const nextResetHours = Math.ceil((SITE_CONFIG.resetWindowMs - (now - keyData.lastReset)) / (1000 * 60 * 60));
         recordErrorLog(req.originalUrl, `Limit harian habis untuk key: ${apiKey}`, 429);
@@ -132,7 +124,6 @@ function checkRateLimit(req, res, next) {
         });
     }
 
-    // Tambahkan pemakaian limit
     keyData.count += 1;
     saveDB(db);
 
@@ -140,12 +131,10 @@ function checkRateLimit(req, res, next) {
     next();
 }
 
-// Route Halaman Utama
 app.get('/', (req, res) => {
     res.render('docs', { config: SITE_CONFIG });
 });
 
-// Endpoint Membuat API Key Baru
 app.post('/api/generate-key', (req, res) => {
     try {
         const db = loadDB();
@@ -167,7 +156,6 @@ app.post('/api/generate-key', (req, res) => {
     }
 });
 
-// Endpoint Cek Status API Key
 app.get('/api/check-key', (req, res) => {
     const { apikey } = req.query;
     if (!apikey) return res.json({ success: false, message: 'Parameter apikey diperlukan.' });
@@ -175,7 +163,6 @@ app.get('/api/check-key', (req, res) => {
     const db = loadDB();
     let keyData = db.keys[apikey];
 
-    // Auto-register jika key berformat SAW- belum ada di DB
     if (!keyData && apikey.startsWith('SAW-')) {
         keyData = {
             key: apikey,
@@ -206,7 +193,7 @@ app.get('/api/check-key', (req, res) => {
     });
 });
 
-// Endpoint Utama Zenuth AI (Integrasi Google Gemini)
+// Endpoint Utama AI (Memakai Gemini 3.8 Flash)
 app.get('/api/ai', checkRateLimit, async (req, res) => {
     const prompt = req.query.prompt;
 
@@ -216,7 +203,8 @@ app.get('/api/ai', checkRateLimit, async (req, res) => {
     }
 
     try {
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+        // Alamat Endpoint Gemini 3.8 Flash Terbaru
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${GEMINI_API_KEY}`;
         
         const response = await fetch(geminiUrl, {
             method: 'POST',
@@ -253,16 +241,12 @@ app.get('/api/ai', checkRateLimit, async (req, res) => {
     }
 });
 
-// Endpoint Mengambil Log Error
 app.get('/api/logs', (req, res) => {
     return res.json({ success: true, totalLogs: errorLogs.length, logs: errorLogs });
 });
 
-// Jalankan Server
 app.listen(PORT, () => {
-    console.log(`=================================================`);
-    console.log(`${SITE_CONFIG.siteName} Aktif di: http://localhost:${PORT}`);
-    console.log(`=================================================`);
+    console.log(`Server aktif di http://localhost:${PORT}`);
 });
 
 module.exports = app;
