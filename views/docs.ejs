@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= config.siteName %> &bull; <%= config.aiName %></title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0c0a09;
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(245, 158, 11, 0.15) 0px, transparent 40%),
+                radial-gradient(at 90% 90%, rgba(234, 88, 12, 0.12) 0px, transparent 40%);
+            background-attachment: fixed;
+        }
+
+        .liquid-glass {
+            background: rgba(28, 25, 23, 0.55);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(251, 191, 36, 0.18);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+        }
+
+        .liquid-glass-glow {
+            background: rgba(28, 25, 23, 0.7);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.15);
+        }
+
+        #sidebar { transition: transform 0.3s ease-in-out; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0c0a09; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
+    </style>
+</head>
+<body class="font-sans text-stone-200 min-h-screen flex flex-col justify-between p-4 sm:p-8">
+
+    <!-- OVERLAY SIDEBAR -->
+    <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
+
+    <!-- SIDEBAR NAVIGASI HAMBURGER -->
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-stone-950/95 border-r border-amber-500/20 z-50 transform -translate-x-full p-6 flex flex-col justify-between shadow-2xl liquid-glass">
+        <div>
+            <div class="flex items-center justify-between pb-6 border-b border-stone-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-black font-extrabold text-sm shadow-md">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <span class="font-extrabold text-white text-sm tracking-wide"><%= config.siteName %></span>
+                </div>
+                <button onclick="toggleSidebar()" class="text-stone-400 hover:text-white p-2">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <nav class="mt-6 space-y-2">
+                <button onclick="switchTab('docs')" id="nav-docs" class="w-full text-left px-4 py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-3 bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    <i class="fa-solid fa-brain text-lg"></i> Dokumentasi <%= config.aiName %>
+                </button>
+                <button onclick="switchTab('settings')" id="nav-settings" class="w-full text-left px-4 py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-3 text-stone-400 hover:bg-stone-800/60 hover:text-white">
+                    <i class="fa-solid fa-sliders text-lg"></i> Pengaturan & Limit Key
+                </button>
+                <button onclick="switchTab('logs')" id="nav-logs" class="w-full text-left px-4 py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-3 text-stone-400 hover:bg-stone-800/60 hover:text-white">
+                    <i class="fa-solid fa-bug text-lg text-rose-400"></i> Error Logs Viewer
+                </button>
+            </nav>
+        </div>
+
+        <div class="text-xs text-stone-500 text-center border-t border-stone-800 pt-4 font-mono">
+            Powered by <%= config.aiName %>
+        </div>
+    </aside>
+
+    <!-- CONTAINER UTAMA -->
+    <div class="max-w-5xl mx-auto w-full space-y-8">
+        
+        <!-- TOPBAR HEADER -->
+        <header class="flex items-center justify-between liquid-glass p-5 rounded-3xl">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()" class="p-3 bg-stone-900 hover:bg-stone-800 border border-amber-500/30 text-amber-400 rounded-2xl transition flex items-center gap-2">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                    <span class="text-xs font-bold text-stone-200 hidden sm:inline">Menu Navigasi</span>
+                </button>
+
+                <div>
+                    <h1 class="font-extrabold text-base sm:text-lg text-white tracking-wide"><%= config.siteName %></h1>
+                    <p class="text-xs text-stone-400 hidden sm:block">Engine AI: <span class="text-amber-400 font-semibold"><%= config.aiName %></span></p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-xs font-mono text-stone-400 font-semibold">Online</span>
+            </div>
+        </header>
+
+        <!-- TAB 1: DOKUMENTASI ZENUTH AI & PLAYGROUND -->
+        <div id="tab-docs" class="space-y-6">
+            <div class="liquid-glass p-6 sm:p-8 rounded-3xl space-y-6">
+                <div>
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-brain text-amber-400"></i> Endpoint <%= config.aiName %>
+                    </h2>
+                    <p class="text-stone-400 text-xs sm:text-sm mt-1">Kirimkan pertanyaan atau perintah teks ke <%= config.aiName %> secara cepat dan fleksibel.</p>
+                </div>
+
+                <div class="p-5 rounded-2xl bg-stone-950/60 border border-stone-800 space-y-4">
+                    <div class="flex flex-wrap items-center gap-2 text-xs font-mono">
+                        <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">GET</span>
+                        <span class="text-white font-bold text-sm">/api/ai</span>
+                    </div>
+
+                    <div class="space-y-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-stone-400 block">Parameter Request</span>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs font-mono">
+                                <thead class="bg-stone-900 text-stone-400 border-b border-stone-800">
+                                    <tr><th class="p-2.5">Parameter</th><th class="p-2.5">Tipe</th><th class="p-2.5">Wajib</th><th class="p-2.5">Keterangan</th></tr>
+                                </thead>
+                                <tbody class="divide-y divide-stone-800/60 text-stone-300">
+                                    <tr>
+                                        <td class="p-2.5 text-amber-400 font-bold">apikey</td>
+                                        <td class="p-2.5">String</td>
+                                        <td class="p-2.5 text-emerald-400">Ya</td>
+                                        <td class="p-2.5">Kunci API milikmu.</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2.5 text-amber-400 font-bold">prompt</td>
+                                        <td class="p-2.5">String</td>
+                                        <td class="p-2.5 text-emerald-400">Ya</td>
+                                        <td class="p-2.5">Pertanyaan atau instruksi untuk <%= config.aiName %>.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- PLAYGROUND DIRECT TEST -->
+                    <div class="pt-4 border-t border-stone-800/80 space-y-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Uji Coba Langsung <%= config.aiName %></span>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <input type="text" id="test-prompt" placeholder="Tanya sesuatu ke <%= config.aiName %>..." class="w-full bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500 font-mono">
+                            <button onclick="testAiApi()" class="px-5 py-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 whitespace-nowrap">
+                                <i class="fa-solid fa-paper-plane"></i> Kirim ke <%= config.aiName %>
+                            </button>
+                        </div>
+
+                        <div id="test-result-box" class="hidden p-4 bg-stone-950 rounded-xl border border-stone-800 font-mono text-xs text-emerald-400 overflow-x-auto">
+                            <pre id="test-result-json">// Jawaban AI muncul di sini</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: PENGATURAN & CEK LIMIT -->
+        <div id="tab-settings" class="hidden space-y-6">
+            <div class="liquid-glass-glow p-6 sm:p-8 rounded-3xl space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-key text-amber-400"></i> Pengaturan & Status API Key
+                        </h2>
+                        <p class="text-stone-400 text-xs sm:text-sm mt-1">Buat API Key baru atau pantau sisa limit harianmu.</p>
+                    </div>
+                    <button onclick="generateApiKey()" class="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 text-black font-bold rounded-2xl text-xs sm:text-sm transition shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate API Key Baru
+                    </button>
+                </div>
+
+                <div id="key-info-card" class="p-5 rounded-2xl bg-stone-950/80 border border-amber-500/30 space-y-4">
+                    <div class="flex items-center justify-between border-b border-stone-800 pb-3">
+                        <span class="text-xs font-mono text-stone-400">API Key Aktif:</span>
+                        <span id="display-key" class="text-sm font-mono font-bold text-amber-300">SAW-XXXXXX</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center font-mono text-xs">
+                        <div class="p-3 bg-stone-900 rounded-xl border border-stone-800">
+                            <span class="text-stone-400 block text-[10px]">TERPAKAI HARI INI</span>
+                            <span id="stat-used" class="text-lg font-bold text-amber-400">0</span>
+                        </div>
+                        <div class="p-3 bg-stone-900 rounded-xl border border-stone-800">
+                            <span class="text-stone-400 block text-[10px]">SISA LIMIT</span>
+                            <span id="stat-remaining" class="text-lg font-bold text-emerald-400">100</span>
+                        </div>
+                        <div class="p-3 bg-stone-900 rounded-xl border border-stone-800">
+                            <span class="text-stone-400 block text-[10px]">TOTAL LIMIT HARIAN</span>
+                            <span id="stat-limit" class="text-lg font-bold text-white"><%= config.defaultLimit %></span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between text-[10px] font-mono text-stone-400">
+                            <span>Penggunaan Limit</span>
+                            <span id="stat-percent">0%</span>
+                        </div>
+                        <div class="w-full bg-stone-900 h-2.5 rounded-full overflow-hidden border border-stone-800">
+                            <div id="limit-progress-bar" class="bg-gradient-to-r from-amber-500 to-orange-500 h-full w-0 transition-all duration-500"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: ERROR LOGS VIEWER -->
+        <div id="tab-logs" class="hidden space-y-6">
+            <div class="liquid-glass p-6 sm:p-8 rounded-3xl space-y-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-bug text-rose-400"></i> Server Error Logs
+                        </h2>
+                        <p class="text-stone-400 text-xs sm:text-sm mt-1">Daftar riwayat error yang terjadi pada server API.</p>
+                    </div>
+                    <button onclick="fetchErrorLogs()" class="px-4 py-2 bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-rotate mr-1"></i> Refresh Logs
+                    </button>
+                </div>
+
+                <div id="logs-container" class="space-y-3 max-h-[450px] overflow-y-auto pr-1">
+                    <div class="text-center text-stone-500 py-8 text-xs font-mono">Memuat log error...</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="text-center text-stone-500 text-xs mt-12 py-4">
+        <%= config.siteName %> &bull; Powered by <%= config.aiName %>
+    </footer>
+
+    <!-- CLIENT LOGIC SCRIPT -->
+    <script>
+        let currentApiKey = localStorage.getItem('saw_api_key') || '';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (currentApiKey) {
+                checkKeyStatus(currentApiKey);
+            }
+        });
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            sidebar.classList.toggle('-translate-x-full');
+            backdrop.classList.toggle('hidden');
+        }
+
+        function switchTab(tabName) {
+            ['docs', 'settings', 'logs'].forEach(tab => {
+                document.getElementById(`tab-${tab}`).classList.add('hidden');
+                document.getElementById(`nav-${tab}`).className = "w-full text-left px-4 py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-3 text-stone-400 hover:bg-stone-800/60 hover:text-white";
+            });
+
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`nav-${tabName}`).className = "w-full text-left px-4 py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-3 bg-amber-500/20 text-amber-300 border border-amber-500/30";
+
+            if (tabName === 'logs') fetchErrorLogs();
+            toggleSidebar();
+        }
+
+        async function generateApiKey() {
+            try {
+                const res = await fetch('/api/generate-key', { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    currentApiKey = data.key;
+                    localStorage.setItem('saw_api_key', data.key);
+                    checkKeyStatus(data.key);
+                    alert('✓ API Key baru berhasil dibuat!');
+                }
+            } catch (err) {
+                alert('Gagal membuat API Key.');
+            }
+        }
+
+        async function checkKeyStatus(key) {
+            try {
+                const res = await fetch(`/api/check-key?apikey=${key}`);
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('display-key').innerText = data.key;
+                    document.getElementById('stat-used').innerText = data.used;
+                    document.getElementById('stat-remaining').innerText = data.remaining;
+                    document.getElementById('stat-limit').innerText = data.limit;
+
+                    const percent = Math.round((data.used / data.limit) * 100);
+                    document.getElementById('stat-percent').innerText = `${percent}%`;
+                    document.getElementById('limit-progress-bar').style.width = `${percent}%`;
+                }
+            } catch (err) {}
+        }
+
+        async function testAiApi() {
+            if (!currentApiKey) {
+                alert('Silakan buat API Key di menu Pengaturan terlebih dahulu!');
+                return;
+            }
+
+            const prompt = document.getElementById('test-prompt').value.trim();
+            if (!prompt) {
+                alert('Masukkan pertanyaan terlebih dahulu!');
+                return;
+            }
+
+            const resultBox = document.getElementById('test-result-box');
+            const resultJson = document.getElementById('test-result-json');
+
+            resultBox.classList.remove('hidden');
+            resultJson.innerText = 'Zenuth AI sedang berpikir...';
+
+            try {
+                const res = await fetch(`/api/ai?apikey=${currentApiKey}&prompt=${encodeURIComponent(prompt)}`);
+                const data = await res.json();
+                resultJson.innerText = JSON.stringify(data, null, 2);
+                checkKeyStatus(currentApiKey);
+            } catch (err) {
+                resultJson.innerText = 'Error: Gagal terhubung ke Zenuth AI Engine.';
+            }
+        }
+
+        async function fetchErrorLogs() {
+            const container = document.getElementById('logs-container');
+            try {
+                const res = await fetch('/api/logs');
+                const data = await res.json();
+
+                if (data.success && data.logs.length > 0) {
+                    container.innerHTML = data.logs.map(log => `
+                        <div class="p-4 rounded-xl bg-stone-950/80 border border-rose-500/20 space-y-1 font-mono text-xs">
+                            <div class="flex items-center justify-between text-stone-400 text-[10px]">
+                                <span class="text-rose-400 font-bold">[${log.statusCode}] ${log.endpoint}</span>
+                                <span>${log.timestamp}</span>
+                            </div>
+                            <p class="text-stone-200">${log.message}</p>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = `<div class="text-center text-stone-500 py-8 text-xs font-mono">✓ Belum ada error tercatat. Server berjalan lancar!</div>`;
+                }
+            } catch (err) {
+                container.innerHTML = `<div class="text-center text-rose-400 py-8 text-xs">Gagal mengambil daftar log error.</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
