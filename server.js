@@ -19,8 +19,8 @@ const SITE_CONFIG = {
     aiName: 'Zenuth AI',
     themeName: 'Liquid Glass Platform',
     defaultLimit: 100,                     // Batas limit per 24 jam
-    resetWindowMs: 24 * 60 * 60 * 1000,     // Durasi 24 jam
-    maxLogsToKeep: 50                      // Batas simpan log error
+    resetWindowMs: 24 * 60 * 60 * 1000,     // Durasi 24 jam dalam milidetik
+    maxLogsToKeep: 50                      // Batas maksimal simpan log error
 };
 
 // API Key Google Gemini untuk Endpoint AI
@@ -28,6 +28,9 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AQ.Ab8RN6L3iwvouEq-l5shid2
 
 const errorLogs = [];
 
+/**
+ * Fungsi untuk mencatat riwayat error ke sistem log
+ */
 function recordErrorLog(endpoint, message, statusCode = 400) {
     const newLog = {
         id: 'LOG-' + Date.now().toString(36).toUpperCase(),
@@ -43,11 +46,15 @@ function recordErrorLog(endpoint, message, statusCode = 400) {
     }
 }
 
+// Middleware Express
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
+/**
+ * Fungsi untuk memuat database JSON lokal/sementara
+ */
 function loadDB() {
     try {
         if (!fs.existsSync(DB_FILE)) {
@@ -61,15 +68,21 @@ function loadDB() {
     }
 }
 
+/**
+ * Fungsi untuk menyimpan data ke file/memori
+ */
 function saveDB(data) {
     memoryDB = data;
     try {
         fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
     } catch (err) {
-        // Fallback simpan di memori
+        // Fallback simpan di memori jika filesystem terisolasi
     }
 }
 
+/**
+ * Middleware Rate Limiter & Auto Recovery Key
+ */
 function checkRateLimit(req, res, next) {
     const apiKey = req.query.apikey || req.body.apikey;
 
@@ -101,11 +114,13 @@ function checkRateLimit(req, res, next) {
 
     const now = Date.now();
 
+    // Reset limit otomatis 24 jam
     if (now - keyData.lastReset >= SITE_CONFIG.resetWindowMs) {
         keyData.count = 0;
         keyData.lastReset = now;
     }
 
+    // Cek batas limit
     if (keyData.count >= keyData.limit) {
         const nextResetHours = Math.ceil((SITE_CONFIG.resetWindowMs - (now - keyData.lastReset)) / (1000 * 60 * 60));
         recordErrorLog(req.originalUrl, `Limit harian habis untuk key: ${apiKey}`, 429);
@@ -124,10 +139,12 @@ function checkRateLimit(req, res, next) {
 
 // 2. ROUTE DAN API ENDPOINTS
 
+// Halaman Utama Dokumentasi
 app.get('/', (req, res) => {
     res.render('docs', { config: SITE_CONFIG });
 });
 
+// Endpoint Buat API Key Baru
 app.post('/api/generate-key', (req, res) => {
     try {
         const db = loadDB();
@@ -149,6 +166,7 @@ app.post('/api/generate-key', (req, res) => {
     }
 });
 
+// Endpoint Cek Status API Key
 app.get('/api/check-key', (req, res) => {
     const { apikey } = req.query;
     if (!apikey) return res.json({ success: false, message: 'Parameter apikey diperlukan.' });
@@ -186,7 +204,7 @@ app.get('/api/check-key', (req, res) => {
     });
 });
 
-// Endpoint 1: Zenuth AI General Prompt (Memakai Gemini API)
+// Endpoint 1: Zenuth AI General Prompt
 app.get('/api/ai', checkRateLimit, async (req, res) => {
     const prompt = req.query.prompt;
 
@@ -231,7 +249,7 @@ app.get('/api/ai', checkRateLimit, async (req, res) => {
     }
 });
 
-// Endpoint 2: Fast Translate (Menggunakan Google Translate GTX API)
+// Endpoint 2: Fast Translate (Google Translate GTX API)
 app.get('/api/translate', checkRateLimit, async (req, res) => {
     const { text, to } = req.query;
 
@@ -240,17 +258,15 @@ app.get('/api/translate', checkRateLimit, async (req, res) => {
         return res.status(400).json({ success: false, message: 'Parameter text tidak boleh kosong!' });
     }
 
-    const targetLang = to || 'en'; // Kode bahasa tujuan (contoh: en, ja, id, ko)
+    const targetLang = to || 'en'; // Kode bahasa (en, ja, id, ko, ar, dll)
 
     try {
-        // Menggunakan Endpoint GTX Google Translate Gratis
         const gtxUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${encodeURIComponent(targetLang)}&dt=t&q=${encodeURIComponent(text)}`;
 
         const response = await fetch(gtxUrl);
         const data = await response.json();
 
         if (data && data[0]) {
-            // Menggabungkan potongan terjemahan jika kalimat panjang
             const translatedText = data[0].map(item => item[0]).filter(Boolean).join('');
 
             return res.json({
