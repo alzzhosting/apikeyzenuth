@@ -57,8 +57,10 @@
 </head>
 <body class="font-sans text-stone-200 min-h-screen flex flex-col justify-between p-4 sm:p-8">
 
+    <!-- OVERLAY SIDEBAR -->
     <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
 
+    <!-- SIDEBAR NAVIGASI HAMBURGER -->
     <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-stone-950/95 border-r border-amber-500/20 z-50 transform -translate-x-full p-6 flex flex-col justify-between shadow-2xl liquid-glass">
         <div>
             <div class="flex items-center justify-between pb-6 border-b border-stone-800">
@@ -75,7 +77,7 @@
 
             <nav class="mt-6 space-y-2">
                 <button onclick="switchTab('docs')" id="nav-docs" class="w-full text-left px-4 py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-3 bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                    <i class="fa-solid fa-brain text-lg"></i> Dokumentasi <%= config.aiName %>
+                    <i class="fa-solid fa-code text-lg"></i> Dokumentasi API
                 </button>
                 <button onclick="switchTab('settings')" id="nav-settings" class="w-full text-left px-4 py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-3 text-stone-400 hover:bg-stone-800/60 hover:text-white">
                     <i class="fa-solid fa-sliders text-lg"></i> Pengaturan & Limit Key
@@ -87,12 +89,14 @@
         </div>
 
         <div class="text-xs text-stone-500 text-center border-t border-stone-800 pt-4 font-mono">
-            Powered by <%= config.aiName %>
+            <%= config.siteName %> &bull; Liquid Glass
         </div>
     </aside>
 
+    <!-- CONTAINER UTAMA -->
     <div class="max-w-5xl mx-auto w-full space-y-8">
         
+        <!-- TOPBAR HEADER -->
         <header class="flex items-center justify-between liquid-glass p-5 rounded-3xl">
             <div class="flex items-center gap-4">
                 <button onclick="toggleSidebar()" class="p-3 bg-stone-900 hover:bg-stone-800 border border-amber-500/30 text-amber-400 rounded-2xl transition flex items-center gap-2">
@@ -102,7 +106,7 @@
 
                 <div>
                     <h1 class="font-extrabold text-base sm:text-lg text-white tracking-wide"><%= config.siteName %></h1>
-                    <p class="text-xs text-stone-400 hidden sm:block">Engine AI: <span class="text-amber-400 font-semibold"><%= config.aiName %></span></p>
+                    <p class="text-xs text-stone-400 hidden sm:block">Platform Rest API Suite</p>
                 </div>
             </div>
 
@@ -117,24 +121,23 @@
             <div class="liquid-glass p-6 sm:p-8 rounded-3xl space-y-6">
                 <div>
                     <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-brain text-amber-400"></i> Endpoint <%= config.aiName %>
+                        <i class="fa-solid fa-cubes text-amber-400"></i> Daftar Endpoint API
                     </h2>
-                    <p class="text-stone-400 text-xs sm:text-sm mt-1">Klik pada nama endpoint untuk membuka detail parameter dan kolom uji coba.</p>
+                    <p class="text-stone-400 text-xs sm:text-sm mt-1">Klik pada nama endpoint untuk membakar/membuka detail parameter dan kolom uji coba.</p>
                 </div>
 
-                <!-- ACCORDION CARD -->
+                <!-- ENDPOINT 1: ZENUTH AI -->
                 <div class="rounded-2xl bg-stone-950/60 border border-stone-800 overflow-hidden">
-                    <!-- HEADER ACCORDION DENGAN PANAH (>) -->
-                    <button onclick="toggleEndpointAccordion()" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-stone-900/60 transition text-left">
+                    <button onclick="toggleAccordion('ai')" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-stone-900/60 transition text-left">
                         <div class="flex items-center gap-3 font-mono text-xs sm:text-sm">
                             <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">GET</span>
                             <span class="text-white font-bold">/api/ai</span>
+                            <span class="text-stone-400 text-xs hidden sm:inline">- <%= config.aiName %> Engine</span>
                         </div>
-                        <i id="accordion-icon" class="fa-solid fa-chevron-right text-amber-400 text-sm transition-transform duration-300"></i>
+                        <i id="accordion-icon-ai" class="fa-solid fa-chevron-right text-amber-400 text-sm transition-transform duration-300"></i>
                     </button>
 
-                    <!-- ISI BODY ACCORDION (COLLAPSIBLE) -->
-                    <div id="accordion-content" class="hidden p-5 border-t border-stone-800/80 space-y-4 bg-stone-950/40">
+                    <div id="accordion-content-ai" class="hidden p-5 border-t border-stone-800/80 space-y-4 bg-stone-950/40">
                         <div class="space-y-2">
                             <span class="text-xs font-bold uppercase tracking-wider text-stone-400 block">Parameter Request</span>
                             <div class="overflow-x-auto">
@@ -160,22 +163,92 @@
                             </div>
                         </div>
 
-                        <!-- PLAYGROUND TEST -->
                         <div class="pt-4 border-t border-stone-800/80 space-y-3">
                             <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Uji Coba Langsung <%= config.aiName %></span>
                             <div class="flex flex-col sm:flex-row gap-2">
-                                <input type="text" id="test-prompt" placeholder="Tanya sesuatu ke <%= config.aiName %>..." class="w-full bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500 font-mono">
+                                <input type="text" id="test-prompt-ai" placeholder="Tanya sesuatu..." class="w-full bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500 font-mono">
                                 <button onclick="testAiApi()" class="px-5 py-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 whitespace-nowrap">
-                                    <i class="fa-solid fa-paper-plane"></i> Kirim ke <%= config.aiName %>
+                                    <i class="fa-solid fa-paper-plane"></i> Kirim
                                 </button>
                             </div>
 
-                            <div id="test-result-box" class="hidden p-4 bg-stone-950 rounded-xl border border-stone-800 font-mono text-xs text-emerald-400 overflow-x-auto">
-                                <pre id="test-result-json">// Jawaban AI muncul di sini</pre>
+                            <div id="test-result-box-ai" class="hidden p-4 bg-stone-950 rounded-xl border border-stone-800 font-mono text-xs text-emerald-400 overflow-x-auto">
+                                <pre id="test-result-json-ai">// Jawaban AI muncul di sini</pre>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- ENDPOINT 2: TRANSLATOR (GTX GOOGLE TRANSLATE) -->
+                <div class="rounded-2xl bg-stone-950/60 border border-stone-800 overflow-hidden">
+                    <button onclick="toggleAccordion('translate')" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-stone-900/60 transition text-left">
+                        <div class="flex items-center gap-3 font-mono text-xs sm:text-sm">
+                            <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">GET</span>
+                            <span class="text-white font-bold">/api/translate</span>
+                            <span class="text-stone-400 text-xs hidden sm:inline">- Fast Google Translator</span>
+                        </div>
+                        <i id="accordion-icon-translate" class="fa-solid fa-chevron-right text-amber-400 text-sm transition-transform duration-300"></i>
+                    </button>
+
+                    <div id="accordion-content-translate" class="hidden p-5 border-t border-stone-800/80 space-y-4 bg-stone-950/40">
+                        <div class="space-y-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-stone-400 block">Parameter Request</span>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs font-mono">
+                                    <thead class="bg-stone-900 text-stone-400 border-b border-stone-800">
+                                        <tr><th class="p-2.5">Parameter</th><th class="p-2.5">Tipe</th><th class="p-2.5">Wajib</th><th class="p-2.5">Keterangan</th></tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-stone-800/60 text-stone-300">
+                                        <tr>
+                                            <td class="p-2.5 text-amber-400 font-bold">apikey</td>
+                                            <td class="p-2.5">String</td>
+                                            <td class="p-2.5 text-emerald-400">Ya</td>
+                                            <td class="p-2.5">Kunci API milikmu.</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-2.5 text-amber-400 font-bold">text</td>
+                                            <td class="p-2.5">String</td>
+                                            <td class="p-2.5 text-emerald-400">Ya</td>
+                                            <td class="p-2.5">Kalimat yang ingin diterjemahkan.</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-2.5 text-amber-400 font-bold">to</td>
+                                            <td class="p-2.5">String</td>
+                                            <td class="p-2.5 text-amber-400">Opsional</td>
+                                            <td class="p-2.5">Kode bahasa tujuan (contoh: en, ja, id, ko, ar, jw). Default: en.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- PLAYGROUND TRANSLATOR -->
+                        <div class="pt-4 border-t border-stone-800/80 space-y-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Uji Coba Langsung Translator</span>
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <input type="text" id="test-text-trans" placeholder="Teks terjemahan (contoh: Selamat pagi)" class="w-full bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500 font-mono">
+                                
+                                <select id="test-to-trans" class="bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-amber-400 focus:outline-none focus:border-amber-500 font-mono">
+                                    <option value="en">Inggris (en)</option>
+                                    <option value="ja">Jepang (ja)</option>
+                                    <option value="id">Indonesia (id)</option>
+                                    <option value="ko">Korea (ko)</option>
+                                    <option value="ar">Arab (ar)</option>
+                                    <option value="jw">Jawa (jw)</option>
+                                </select>
+
+                                <button onclick="testTranslateApi()" class="px-5 py-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 whitespace-nowrap">
+                                    <i class="fa-solid fa-language"></i> Terjemahkan
+                                </button>
+                            </div>
+
+                            <div id="test-result-box-trans" class="hidden p-4 bg-stone-950 rounded-xl border border-stone-800 font-mono text-xs text-emerald-400 overflow-x-auto">
+                                <pre id="test-result-json-trans">// Hasil Terjemahan muncul di sini</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -236,7 +309,7 @@
                         <h2 class="text-xl font-bold text-white flex items-center gap-2">
                             <i class="fa-solid fa-bug text-rose-400"></i> Server Error Logs
                         </h2>
-                        <p class="text-stone-400 text-xs sm:text-sm mt-1">Daftar riwayat error pada server.</p>
+                        <p class="text-stone-400 text-xs sm:text-sm mt-1">Daftar riwayat error yang terjadi pada server.</p>
                     </div>
                     <button onclick="fetchErrorLogs()" class="px-4 py-2 bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
                         <i class="fa-solid fa-rotate mr-1"></i> Refresh Logs
@@ -251,10 +324,12 @@
 
     </div>
 
+    <!-- FOOTER -->
     <footer class="text-center text-stone-500 text-xs mt-12 py-4">
-        <%= config.siteName %> &bull; Powered by <%= config.aiName %>
+        <%= config.siteName %> &bull; Theme Liquid Glass Saweria
     </footer>
 
+    <!-- CLIENT SCRIPT -->
     <script>
         let currentApiKey = localStorage.getItem('saw_api_key') || '';
 
@@ -271,9 +346,9 @@
             backdrop.classList.toggle('hidden');
         }
 
-        function toggleEndpointAccordion() {
-            const content = document.getElementById('accordion-content');
-            const icon = document.getElementById('accordion-icon');
+        function toggleAccordion(name) {
+            const content = document.getElementById(`accordion-content-${name}`);
+            const icon = document.getElementById(`accordion-icon-${name}`);
             
             content.classList.toggle('hidden');
             icon.classList.toggle('rotate-90');
@@ -332,14 +407,14 @@
                 return;
             }
 
-            const prompt = document.getElementById('test-prompt').value.trim();
+            const prompt = document.getElementById('test-prompt-ai').value.trim();
             if (!prompt) {
                 alert('Masukkan pertanyaan terlebih dahulu!');
                 return;
             }
 
-            const resultBox = document.getElementById('test-result-box');
-            const resultJson = document.getElementById('test-result-json');
+            const resultBox = document.getElementById('test-result-box-ai');
+            const resultJson = document.getElementById('test-result-json-ai');
 
             resultBox.classList.remove('hidden');
             resultJson.innerText = 'Zenuth AI sedang berpikir...';
@@ -350,7 +425,37 @@
                 resultJson.innerText = JSON.stringify(data, null, 2);
                 checkKeyStatus(currentApiKey);
             } catch (err) {
-                resultJson.innerText = 'Error: Gagal terhubung ke Zenuth AI Engine.';
+                resultJson.innerText = 'Error: Gagal terhubung ke AI Engine.';
+            }
+        }
+
+        async function testTranslateApi() {
+            if (!currentApiKey) {
+                alert('Silakan buat API Key di menu Pengaturan terlebih dahulu!');
+                return;
+            }
+
+            const text = document.getElementById('test-text-trans').value.trim();
+            const to = document.getElementById('test-to-trans').value;
+
+            if (!text) {
+                alert('Masukkan teks terjemahan terlebih dahulu!');
+                return;
+            }
+
+            const resultBox = document.getElementById('test-result-box-trans');
+            const resultJson = document.getElementById('test-result-json-trans');
+
+            resultBox.classList.remove('hidden');
+            resultJson.innerText = 'Memproses terjemahan...';
+
+            try {
+                const res = await fetch(`/api/translate?apikey=${currentApiKey}&text=${encodeURIComponent(text)}&to=${encodeURIComponent(to)}`);
+                const data = await res.json();
+                resultJson.innerText = JSON.stringify(data, null, 2);
+                checkKeyStatus(currentApiKey);
+            } catch (err) {
+                resultJson.innerText = 'Error: Gagal terhubung ke Translator Engine.';
             }
         }
 
