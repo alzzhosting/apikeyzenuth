@@ -18,23 +18,26 @@ const SITE_CONFIG = {
     siteName: 'Zenuth AI Engine',
     aiName: 'Zenuth AI',
     themeName: 'Liquid Glass Platform',
-    defaultLimit: 100,
-    resetWindowMs: 24 * 60 * 60 * 1000,
-    maxLogsToKeep: 50
+    defaultLimit: 100,                     // Batas limit per 24 jam
+    resetWindowMs: 24 * 60 * 60 * 1000,     // Durasi 24 jam
+    maxLogsToKeep: 50                      // Batas simpan log error
 };
 
 // API Key Google Gemini
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AQ.Ab8RN6L3iwvouEq-l5shid2D11Y6XAPKzBn_mOT7QrEubSYJog';
 
-// Daftar Model Gemini Utama & Cadangan untuk Antisipasi High Demand
+// Daftar Model Resmi yang Valid di v1beta
 const GEMINI_MODELS = [
     'gemini-1.5-flash',
-    'gemini-2.0-flash',
-    'gemini-1.5-pro'
+    'gemini-1.5-flash-8b',
+    'gemini-1.5-pro-latest'
 ];
 
 const errorLogs = [];
 
+/**
+ * Fungsi untuk mencatat riwayat error ke sistem log
+ */
 function recordErrorLog(endpoint, message, statusCode = 400) {
     const newLog = {
         id: 'LOG-' + Date.now().toString(36).toUpperCase(),
@@ -73,10 +76,13 @@ function saveDB(data) {
     try {
         fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
     } catch (err) {
-        // Fallback simpan di memori
+        // Fallback simpan di memori jika filesystem terisolasi
     }
 }
 
+/**
+ * Middleware Rate Limiter & Auto Recovery Key
+ */
 function checkRateLimit(req, res, next) {
     const apiKey = req.query.apikey || req.body.apikey;
 
@@ -88,7 +94,7 @@ function checkRateLimit(req, res, next) {
     const db = loadDB();
     let keyData = db.keys[apiKey];
 
-    // Pemulihan otomatis jika key SAW- terhapus dari memori
+    // Pemulihan otomatis jika key SAW- terhapus dari memori serverless
     if (!keyData && apiKey.startsWith('SAW-')) {
         keyData = {
             key: apiKey,
@@ -108,11 +114,13 @@ function checkRateLimit(req, res, next) {
 
     const now = Date.now();
 
+    // Reset limit otomatis 24 jam
     if (now - keyData.lastReset >= SITE_CONFIG.resetWindowMs) {
         keyData.count = 0;
         keyData.lastReset = now;
     }
 
+    // Cek batas limit
     if (keyData.count >= keyData.limit) {
         const nextResetHours = Math.ceil((SITE_CONFIG.resetWindowMs - (now - keyData.lastReset)) / (1000 * 60 * 60));
         recordErrorLog(req.originalUrl, `Limit harian habis untuk key: ${apiKey}`, 429);
@@ -191,7 +199,7 @@ app.get('/api/check-key', (req, res) => {
     });
 });
 
-// Endpoint Utama AI dengan Sistem Model Fallback
+// Endpoint Utama AI dengan Fallback Model Valid
 app.get('/api/ai', checkRateLimit, async (req, res) => {
     const prompt = req.query.prompt;
 
@@ -203,7 +211,7 @@ app.get('/api/ai', checkRateLimit, async (req, res) => {
     let aiReply = null;
     let lastErrorMessage = 'Tidak ada respons valid dari seluruh model.';
 
-    // Mencoba model secara berurutan sampai menemukan model yang tidak sibuk
+    // Mencoba model secara berurutan
     for (const model of GEMINI_MODELS) {
         try {
             const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
@@ -220,7 +228,7 @@ app.get('/api/ai', checkRateLimit, async (req, res) => {
 
             if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
                 aiReply = data.candidates[0].content.parts[0].text;
-                break; // Berhasil mendapatkan respons, keluar dari perulangan
+                break; // Keluar dari perulangan jika berhasil
             } else if (data.error) {
                 lastErrorMessage = `Model ${model}: ${data.error.message}`;
             }
@@ -229,7 +237,6 @@ app.get('/api/ai', checkRateLimit, async (req, res) => {
         }
     }
 
-    // Kirim hasil jika salah satu model berhasil merespons
     if (aiReply) {
         return res.json({
             success: true,
