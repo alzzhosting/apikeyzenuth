@@ -5,29 +5,27 @@ const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const DB_FILE = path.join(__dirname, 'database.json');
 
-// =========================================================================
-// 1. PENGATURAN TERPUSAT & GEMINI API KEY
-// =========================================================================
+// Gunakan folder /tmp jika di Vercel agar tidak terkunci Read-Only
+const DB_FILE = process.env.VERCEL 
+    ? path.join('/tmp', 'database.json') 
+    : path.join(__dirname, 'database.json');
+
+// Memory backup jika filesystem tidak tersedia
+let memoryDB = { keys: {} };
+
 const SITE_CONFIG = {
     siteName: 'Zenuth AI Engine',
     aiName: 'Zenuth AI',
     themeName: 'Liquid Glass Platform',
-    defaultLimit: 100,                     // Limit harian per API Key
-    resetWindowMs: 24 * 60 * 60 * 1000,     // Durasi reset 24 jam (milidetik)
-    maxLogsToKeep: 50                      // Batas simpan riwayat error log
+    defaultLimit: 100,
+    resetWindowMs: 24 * 60 * 60 * 1000,
+    maxLogsToKeep: 50
 };
 
-// API Key Google Gemini
 const GEMINI_API_KEY = 'AQ.Ab8RN6JOzUZtqxehiP4m7pQyNPand0a7eB79sG1acP0wauo1Fg';
-
-// Array Penyimpan Log Error Server
 const errorLogs = [];
 
-/**
- * Fungsi untuk mencatat setiap error ke dalam riwayat log
- */
 function recordErrorLog(endpoint, message, statusCode = 400) {
     const newLog = {
         id: 'LOG-' + Date.now().toString(36).toUpperCase(),
@@ -43,32 +41,38 @@ function recordErrorLog(endpoint, message, statusCode = 400) {
     }
 }
 
-// Middleware Express
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Management Database JSON Lokal
 function loadDB() {
-    if (!fs.existsSync(DB_FILE)) {
-        fs.writeFileSync(DB_FILE, JSON.stringify({ keys: {} }, null, 2));
+    try {
+        if (!fs.existsSync(DB_FILE)) {
+            fs.writeFileSync(DB_FILE, JSON.stringify(memoryDB, null, 2));
+        }
+        const data = fs.readFileSync(DB_FILE, 'utf-8');
+        memoryDB = JSON.parse(data);
+        return memoryDB;
+    } catch (err) {
+        return memoryDB;
     }
-    return JSON.parse(fs.readFileSync(DB_FILE, 'utf-8'));
 }
 
 function saveDB(data) {
-    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+    memoryDB = data;
+    try {
+        fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+    } catch (err) {
+        // Fallback simpan di memori jika filesystem terbatas
+    }
 }
 
-// =========================================================================
-// 2. MIDDLEWARE CHECKER RATE LIMIT 24 JAM
-// =========================================================================
 function checkRateLimit(req, res, next) {
     const apiKey = req.query.apikey || req.body.apikey;
 
     if (!apiKey) {
-        recordErrorLog(req.originalUrl, 'Akses ditolak: API Key tidak disertakan dalam request', 401);
+        recordErrorLog(req.originalUrl, 'Akses ditolak: API Key tidak ditemukan', 401);
         return res.status(401).json({ success: false, message: 'API Key dibutuhkan! Dapatkan key di menu Pengaturan.' });
     }
 
@@ -77,30 +81,25 @@ function checkRateLimit(req, res, next) {
 
     if (!keyData) {
         recordErrorLog(req.originalUrl, `API Key tidak terdaftar: ${apiKey}`, 403);
-        return res.status(403).json({ success: false, message: 'API Key tidak valid atau belum terdaftar!' });
+        return res.status(403).json({ success: false, message: 'API Key tidak valid!' });
     }
 
     const now = Date.now();
 
-    // Reset otomatis jika sudah melewati 24 jam
     if (now - keyData.lastReset >= SITE_CONFIG.resetWindowMs) {
         keyData.count = 0;
         keyData.lastReset = now;
     }
 
-    // Cek jika limit harian sudah habis
     if (keyData.count >= keyData.limit) {
         const nextResetHours = Math.ceil((SITE_CONFIG.resetWindowMs - (now - keyData.lastReset)) / (1000 * 60 * 60));
-        const errorMsg = `Limit harian habis (${keyData.limit}/${keyData.limit}) untuk key ${apiKey}. Reset dalam ${nextResetHours} jam.`;
-        
-        recordErrorLog(req.originalUrl, errorMsg, 429);
+        recordErrorLog(req.originalUrl, `Limit habis untuk key: ${apiKey}`, 429);
         return res.status(429).json({
             success: false,
-            message: `Limit request harian (${keyData.limit}/${keyData.limit}) telah habis. Otomatis reset dalam ${nextResetHours} jam.`
+            message: `Limit harian (${keyData.limit}/${keyData.limit}) telah habis. Otomatis reset dalam ${nextResetHours} jam.`
         });
     }
 
-    // Tambah jumlah pemakaian
     keyData.count += 1;
     saveDB(db);
 
@@ -108,45 +107,39 @@ function checkRateLimit(req, res, next) {
     next();
 }
 
-// =========================================================================
-// 3. ROUTE DAN ENDPOINT API
-// =========================================================================
-
-// Halaman Utama Dokumentasi
 app.get('/', (req, res) => {
     res.render('docs', { config: SITE_CONFIG });
 });
 
-// Endpoint Membuat API Key Baru
 app.post('/api/generate-key', (req, res) => {
-    const db = loadDB();
-    const newKey = 'SAW-' + crypto.randomBytes(6).toString('hex').toUpperCase();
+    try {
+        const db = loadDB();
+        const newKey = 'SAW-' + crypto.randomBytes(6).toString('hex').toUpperCase();
 
-    db.keys[newKey] = {
-        key: newKey,
-        count: 0,
-        limit: SITE_CONFIG.defaultLimit,
-        createdAt: Date.now(),
-        lastReset: Date.now()
-    };
+        db.keys[newKey] = {
+            key: newKey,
+            count: 0,
+            limit: SITE_CONFIG.defaultLimit,
+            createdAt: Date.now(),
+            lastReset: Date.now()
+        };
 
-    saveDB(db);
-    return res.json({ success: true, key: newKey, limit: SITE_CONFIG.defaultLimit });
+        saveDB(db);
+        return res.json({ success: true, key: newKey, limit: SITE_CONFIG.defaultLimit });
+    } catch (err) {
+        recordErrorLog('/api/generate-key', err.message, 500);
+        return res.status(500).json({ success: false, message: 'Gagal membuat API Key pada server.' });
+    }
 });
 
-// Endpoint Cek Status Limit API Key
 app.get('/api/check-key', (req, res) => {
     const { apikey } = req.query;
-    if (!apikey) {
-        return res.json({ success: false, message: 'Parameter apikey diperlukan.' });
-    }
+    if (!apikey) return res.json({ success: false, message: 'Parameter apikey diperlukan.' });
 
     const db = loadDB();
     const keyData = db.keys[apikey];
 
-    if (!keyData) {
-        return res.json({ success: false, message: 'Key tidak ditemukan.' });
-    }
+    if (!keyData) return res.json({ success: false, message: 'Key tidak ditemukan.' });
 
     const now = Date.now();
     if (now - keyData.lastReset >= SITE_CONFIG.resetWindowMs) {
@@ -164,36 +157,27 @@ app.get('/api/check-key', (req, res) => {
     });
 });
 
-// =========================================================================
-// 4. ENDPOINT ZENUTH AI (INTEGRASI GOOGLE GEMINI)
-// =========================================================================
 app.get('/api/ai', checkRateLimit, async (req, res) => {
     const prompt = req.query.prompt;
 
     if (!prompt || prompt.trim() === '') {
-        recordErrorLog(req.originalUrl, 'Parameter prompt kosong pada request AI', 400);
+        recordErrorLog(req.originalUrl, 'Parameter prompt kosong', 400);
         return res.status(400).json({ success: false, message: 'Parameter prompt tidak boleh kosong!' });
     }
 
     try {
-        // Pemanggilan REST API Google Gemini 2.5 Flash
         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
         
         const response = await fetch(geminiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [
-                    {
-                        parts: [{ text: prompt }]
-                    }
-                ]
+                contents: [{ parts: [{ text: prompt }] }]
             })
         });
 
         const data = await response.json();
 
-        // Cek jika respons dari Gemini berhasil
         if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
             const aiReply = data.candidates[0].content.parts[0].text;
 
@@ -209,38 +193,22 @@ app.get('/api/ai', checkRateLimit, async (req, res) => {
                 }
             });
         } else {
-            // Tangkap pesan error dari API Gemini jika ada
-            const errMsg = data.error ? data.error.message : 'Gagal memperoleh respons valid dari engine Gemini.';
-            recordErrorLog(req.originalUrl, `Gemini API Error: ${errMsg}`, 500);
-
-            return res.status(500).json({
-                success: false,
-                author: SITE_CONFIG.aiName,
-                message: `Gagal memproses AI: ${errMsg}`
-            });
+            const errMsg = data.error ? data.error.message : 'Respons Gemini tidak valid.';
+            recordErrorLog(req.originalUrl, errMsg, 500);
+            return res.status(500).json({ success: false, author: SITE_CONFIG.aiName, message: `Gagal memproses AI: ${errMsg}` });
         }
     } catch (err) {
-        recordErrorLog(req.originalUrl, `Server Exception: ${err.message}`, 500);
-        return res.status(500).json({
-            success: false,
-            author: SITE_CONFIG.aiName,
-            message: 'Terjadi kesalahan pada server saat menghubungkan ke AI.'
-        });
+        recordErrorLog(req.originalUrl, err.message, 500);
+        return res.status(500).json({ success: false, author: SITE_CONFIG.aiName, message: 'Kesalahan server saat menghubungi AI.' });
     }
 });
 
-// Endpoint Mengambil Log Error
 app.get('/api/logs', (req, res) => {
-    return res.json({
-        success: true,
-        totalLogs: errorLogs.length,
-        logs: errorLogs
-    });
+    return res.json({ success: true, totalLogs: errorLogs.length, logs: errorLogs });
 });
 
-// Menjalankan Server
 app.listen(PORT, () => {
-    console.log(`=================================================`);
-    console.log(`${SITE_CONFIG.siteName} (${SITE_CONFIG.aiName}) Aktif di: http://localhost:${PORT}`);
-    console.log(`=================================================`);
+    console.log(`Server aktif di http://localhost:${PORT}`);
 });
+
+module.exports = app;
