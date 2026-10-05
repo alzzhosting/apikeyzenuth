@@ -2,7 +2,6 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
-const { GoogleGenAI } = require('@google/genai');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,9 +23,8 @@ const SITE_CONFIG = {
     maxLogsToKeep: 50                      // Batas maksimal simpan log error
 };
 
-// Inisialisasi SDK Google Gen AI
-const GEMINI_KEY = process.env.GEMINI_API_KEY || 'AQ.Ab8RN6L3iwvouEq-l5shid2D11Y6XAPKzBn_mOT7QrEubSYJog';
-const ai = new GoogleGenAI({ apiKey: GEMINI_KEY });
+// API Key Google Gemini
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AQ.Ab8RN6L3iwvouEq-l5shid2D11Y6XAPKzBn_mOT7QrEubSYJog';
 
 // Array Penyimpanan Log Error
 const errorLogs = [];
@@ -207,7 +205,7 @@ app.get('/api/check-key', (req, res) => {
     });
 });
 
-// Endpoint Utama Zenuth AI (Menggunakan SDK @google/genai)
+// Endpoint Utama Zenuth AI (Menggunakan Native Fetch HTTPS REST API)
 app.get('/api/ai', checkRateLimit, async (req, res) => {
     const prompt = req.query.prompt;
 
@@ -217,18 +215,27 @@ app.get('/api/ai', checkRateLimit, async (req, res) => {
     }
 
     try {
-        // Memanggil SDK @google/genai
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
+        // Pemanggilan Native REST API Gemini tanpa SDK
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+        
+        const response = await fetch(geminiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }]
+            })
         });
 
-        if (response && response.text) {
+        const data = await response.json();
+
+        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
+            const aiReply = data.candidates[0].content.parts[0].text;
+
             return res.json({
                 success: true,
                 author: SITE_CONFIG.aiName,
                 prompt: prompt,
-                result: response.text,
+                result: aiReply,
                 usage: {
                     usedToday: req.keyInfo.count,
                     remaining: req.keyInfo.limit - req.keyInfo.count,
@@ -236,11 +243,16 @@ app.get('/api/ai', checkRateLimit, async (req, res) => {
                 }
             });
         } else {
-            recordErrorLog(req.originalUrl, 'Respons kosong dari SDK GenAI', 500);
-            return res.status(500).json({ success: false, author: SITE_CONFIG.aiName, message: 'Gagal memperoleh jawaban dari AI.' });
+            const errMsg = data.error ? data.error.message : 'Respons dari Gemini tidak valid.';
+            recordErrorLog(req.originalUrl, errMsg, 500);
+            return res.status(500).json({ 
+                success: false, 
+                author: SITE_CONFIG.aiName, 
+                message: `Gagal memproses AI: ${errMsg}` 
+            });
         }
     } catch (err) {
-        recordErrorLog(req.originalUrl, `GenAI Exception: ${err.message}`, 500);
+        recordErrorLog(req.originalUrl, `Fetch Exception: ${err.message}`, 500);
         return res.status(500).json({ 
             success: false, 
             author: SITE_CONFIG.aiName, 
