@@ -57,10 +57,8 @@
 </head>
 <body class="font-sans text-stone-200 min-h-screen flex flex-col justify-between p-4 sm:p-8">
 
-    <!-- OVERLAY SIDEBAR -->
     <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
 
-    <!-- SIDEBAR NAVIGASI HAMBURGER -->
     <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-stone-950/95 border-r border-amber-500/20 z-50 transform -translate-x-full p-6 flex flex-col justify-between shadow-2xl liquid-glass">
         <div>
             <div class="flex items-center justify-between pb-6 border-b border-stone-800">
@@ -93,10 +91,8 @@
         </div>
     </aside>
 
-    <!-- CONTAINER UTAMA -->
     <div class="max-w-5xl mx-auto w-full space-y-8">
         
-        <!-- TOPBAR HEADER -->
         <header class="flex items-center justify-between liquid-glass p-5 rounded-3xl">
             <div class="flex items-center gap-4">
                 <button onclick="toggleSidebar()" class="p-3 bg-stone-900 hover:bg-stone-800 border border-amber-500/30 text-amber-400 rounded-2xl transition flex items-center gap-2">
@@ -116,66 +112,74 @@
             </div>
         </header>
 
-        <!-- TAB 1: DOKUMENTASI ZENUTH AI & PLAYGROUND -->
+        <!-- TAB 1: DOKUMENTASI API ACCORDION -->
         <div id="tab-docs" class="space-y-6">
             <div class="liquid-glass p-6 sm:p-8 rounded-3xl space-y-6">
                 <div>
                     <h2 class="text-xl font-bold text-white flex items-center gap-2">
                         <i class="fa-solid fa-brain text-amber-400"></i> Endpoint <%= config.aiName %>
                     </h2>
-                    <p class="text-stone-400 text-xs sm:text-sm mt-1">Kirimkan pertanyaan atau perintah teks ke <%= config.aiName %> secara cepat dan fleksibel.</p>
+                    <p class="text-stone-400 text-xs sm:text-sm mt-1">Klik pada nama endpoint untuk membuka detail parameter dan kolom uji coba.</p>
                 </div>
 
-                <div class="p-5 rounded-2xl bg-stone-950/60 border border-stone-800 space-y-4">
-                    <div class="flex flex-wrap items-center gap-2 text-xs font-mono">
-                        <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">GET</span>
-                        <span class="text-white font-bold text-sm">/api/ai</span>
-                    </div>
-
-                    <div class="space-y-2">
-                        <span class="text-xs font-bold uppercase tracking-wider text-stone-400 block">Parameter Request</span>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs font-mono">
-                                <thead class="bg-stone-900 text-stone-400 border-b border-stone-800">
-                                    <tr><th class="p-2.5">Parameter</th><th class="p-2.5">Tipe</th><th class="p-2.5">Wajib</th><th class="p-2.5">Keterangan</th></tr>
-                                </thead>
-                                <tbody class="divide-y divide-stone-800/60 text-stone-300">
-                                    <tr>
-                                        <td class="p-2.5 text-amber-400 font-bold">apikey</td>
-                                        <td class="p-2.5">String</td>
-                                        <td class="p-2.5 text-emerald-400">Ya</td>
-                                        <td class="p-2.5">Kunci API milikmu.</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="p-2.5 text-amber-400 font-bold">prompt</td>
-                                        <td class="p-2.5">String</td>
-                                        <td class="p-2.5 text-emerald-400">Ya</td>
-                                        <td class="p-2.5">Pertanyaan atau instruksi untuk <%= config.aiName %>.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                <!-- ACCORDION CARD -->
+                <div class="rounded-2xl bg-stone-950/60 border border-stone-800 overflow-hidden">
+                    <!-- HEADER ACCORDION DENGAN PANAH (>) -->
+                    <button onclick="toggleEndpointAccordion()" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-stone-900/60 transition text-left">
+                        <div class="flex items-center gap-3 font-mono text-xs sm:text-sm">
+                            <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">GET</span>
+                            <span class="text-white font-bold">/api/ai</span>
                         </div>
-                    </div>
+                        <i id="accordion-icon" class="fa-solid fa-chevron-right text-amber-400 text-sm transition-transform duration-300"></i>
+                    </button>
 
-                    <!-- PLAYGROUND DIRECT TEST -->
-                    <div class="pt-4 border-t border-stone-800/80 space-y-3">
-                        <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Uji Coba Langsung <%= config.aiName %></span>
-                        <div class="flex flex-col sm:flex-row gap-2">
-                            <input type="text" id="test-prompt" placeholder="Tanya sesuatu ke <%= config.aiName %>..." class="w-full bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500 font-mono">
-                            <button onclick="testAiApi()" class="px-5 py-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 whitespace-nowrap">
-                                <i class="fa-solid fa-paper-plane"></i> Kirim ke <%= config.aiName %>
-                            </button>
+                    <!-- ISI BODY ACCORDION (COLLAPSIBLE) -->
+                    <div id="accordion-content" class="hidden p-5 border-t border-stone-800/80 space-y-4 bg-stone-950/40">
+                        <div class="space-y-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-stone-400 block">Parameter Request</span>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs font-mono">
+                                    <thead class="bg-stone-900 text-stone-400 border-b border-stone-800">
+                                        <tr><th class="p-2.5">Parameter</th><th class="p-2.5">Tipe</th><th class="p-2.5">Wajib</th><th class="p-2.5">Keterangan</th></tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-stone-800/60 text-stone-300">
+                                        <tr>
+                                            <td class="p-2.5 text-amber-400 font-bold">apikey</td>
+                                            <td class="p-2.5">String</td>
+                                            <td class="p-2.5 text-emerald-400">Ya</td>
+                                            <td class="p-2.5">Kunci API milikmu.</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="p-2.5 text-amber-400 font-bold">prompt</td>
+                                            <td class="p-2.5">String</td>
+                                            <td class="p-2.5 text-emerald-400">Ya</td>
+                                            <td class="p-2.5">Pertanyaan atau instruksi untuk <%= config.aiName %>.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
-                        <div id="test-result-box" class="hidden p-4 bg-stone-950 rounded-xl border border-stone-800 font-mono text-xs text-emerald-400 overflow-x-auto">
-                            <pre id="test-result-json">// Jawaban AI muncul di sini</pre>
+                        <!-- PLAYGROUND TEST -->
+                        <div class="pt-4 border-t border-stone-800/80 space-y-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Uji Coba Langsung <%= config.aiName %></span>
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <input type="text" id="test-prompt" placeholder="Tanya sesuatu ke <%= config.aiName %>..." class="w-full bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500 font-mono">
+                                <button onclick="testAiApi()" class="px-5 py-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 whitespace-nowrap">
+                                    <i class="fa-solid fa-paper-plane"></i> Kirim ke <%= config.aiName %>
+                                </button>
+                            </div>
+
+                            <div id="test-result-box" class="hidden p-4 bg-stone-950 rounded-xl border border-stone-800 font-mono text-xs text-emerald-400 overflow-x-auto">
+                                <pre id="test-result-json">// Jawaban AI muncul di sini</pre>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- TAB 2: PENGATURAN & CEK LIMIT -->
+        <!-- TAB 2: PENGATURAN & LIMIT -->
         <div id="tab-settings" class="hidden space-y-6">
             <div class="liquid-glass-glow p-6 sm:p-8 rounded-3xl space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -224,7 +228,7 @@
             </div>
         </div>
 
-        <!-- TAB 3: ERROR LOGS VIEWER -->
+        <!-- TAB 3: ERROR LOGS -->
         <div id="tab-logs" class="hidden space-y-6">
             <div class="liquid-glass p-6 sm:p-8 rounded-3xl space-y-6">
                 <div class="flex items-center justify-between">
@@ -232,7 +236,7 @@
                         <h2 class="text-xl font-bold text-white flex items-center gap-2">
                             <i class="fa-solid fa-bug text-rose-400"></i> Server Error Logs
                         </h2>
-                        <p class="text-stone-400 text-xs sm:text-sm mt-1">Daftar riwayat error yang terjadi pada server API.</p>
+                        <p class="text-stone-400 text-xs sm:text-sm mt-1">Daftar riwayat error pada server.</p>
                     </div>
                     <button onclick="fetchErrorLogs()" class="px-4 py-2 bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
                         <i class="fa-solid fa-rotate mr-1"></i> Refresh Logs
@@ -247,12 +251,10 @@
 
     </div>
 
-    <!-- FOOTER -->
     <footer class="text-center text-stone-500 text-xs mt-12 py-4">
         <%= config.siteName %> &bull; Powered by <%= config.aiName %>
     </footer>
 
-    <!-- CLIENT LOGIC SCRIPT -->
     <script>
         let currentApiKey = localStorage.getItem('saw_api_key') || '';
 
@@ -267,6 +269,14 @@
             const backdrop = document.getElementById('sidebar-backdrop');
             sidebar.classList.toggle('-translate-x-full');
             backdrop.classList.toggle('hidden');
+        }
+
+        function toggleEndpointAccordion() {
+            const content = document.getElementById('accordion-content');
+            const icon = document.getElementById('accordion-icon');
+            
+            content.classList.toggle('hidden');
+            icon.classList.toggle('rotate-90');
         }
 
         function switchTab(tabName) {
@@ -291,6 +301,8 @@
                     localStorage.setItem('saw_api_key', data.key);
                     checkKeyStatus(data.key);
                     alert('✓ API Key baru berhasil dibuat!');
+                } else {
+                    alert(`✕ ${data.message}`);
                 }
             } catch (err) {
                 alert('Gagal membuat API Key.');
