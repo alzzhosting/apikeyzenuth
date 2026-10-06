@@ -123,7 +123,7 @@
                     <h2 class="text-xl font-bold text-white flex items-center gap-2">
                         <i class="fa-solid fa-cubes text-emerald-400"></i> Daftar Endpoint & Contoh Integrasi
                     </h2>
-                    <p class="text-emerald-300/70 text-xs sm:text-sm mt-1">Klik pada nama endpoint untuk melihat parameter, uji coba langsung, dan contoh salinan kode.</p>
+                    <p class="text-emerald-300/70 text-xs sm:text-sm mt-1">Klik pada nama endpoint untuk melihat parameter, uji coba langsung, serta contoh kode cURL dan JavaScript.</p>
                 </div>
 
                 <!-- ENDPOINT 1: AI PROMPT -->
@@ -138,13 +138,6 @@
                     </button>
 
                     <div id="accordion-content-ai" class="hidden p-5 border-t border-emerald-900/40 space-y-6 bg-emerald-950/20">
-                        <table class="w-full text-left text-xs font-mono">
-                            <thead class="bg-emerald-950 text-emerald-400 border-b border-emerald-900"><tr><th class="p-2">Parameter</th><th class="p-2">Wajib</th><th class="p-2">Keterangan</th></tr></thead>
-                            <tbody class="divide-y divide-emerald-900/30 text-emerald-200">
-                                <tr><td class="p-2 text-emerald-400 font-bold">apikey</td><td class="p-2">Ya</td><td class="p-2">Kunci API</td></tr>
-                                <tr><td class="p-2 text-emerald-400 font-bold">prompt</td><td class="p-2">Ya</td><td class="p-2">Pertanyaan AI</td></tr>
-                            </tbody>
-                        </table>
                         <div class="space-y-3">
                             <div class="flex gap-2">
                                 <input type="text" id="test-prompt-ai" placeholder="Tanya sesuatu..." class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-white font-mono">
@@ -152,9 +145,19 @@
                             </div>
                             <div id="test-result-box-ai" class="hidden p-3 bg-emerald-950/80 rounded-xl font-mono text-xs text-emerald-300"><pre id="test-result-json-ai"></pre></div>
                         </div>
+
+                        <!-- Code Snippet cURL -->
                         <div class="space-y-2">
-                            <div class="flex justify-between text-xs text-emerald-400"><span>cURL / JS Example</span><button onclick="copyCode('code-ai', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
-                            <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-ai">curl "https://apikeyzenuth.vercel.app/api/ai?apikey=YOUR_KEY&prompt=halo"</pre></div>
+                            <div class="flex justify-between text-xs text-emerald-400"><span>cURL Example</span><button onclick="copyCode('code-ai-curl', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
+                            <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-ai-curl">curl "https://apikeyzenuth.vercel.app/api/ai?apikey=YOUR_KEY&prompt=halo"</pre></div>
+                        </div>
+
+                        <!-- Code Snippet JavaScript -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs text-emerald-400"><span>JavaScript (Fetch) Example</span><button onclick="copyCode('code-ai-js', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
+                            <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-ai-js">const res = await fetch('https://apikeyzenuth.vercel.app/api/ai?apikey=YOUR_KEY&prompt=halo');
+const data = await res.json();
+console.log(data.result);</pre></div>
                         </div>
                     </div>
                 </div>
@@ -178,9 +181,17 @@
                             </div>
                             <div id="test-result-box-trans" class="hidden p-3 bg-emerald-950/80 rounded-xl font-mono text-xs text-emerald-300"><pre id="test-result-json-trans"></pre></div>
                         </div>
+
                         <div class="space-y-2">
-                            <div class="flex justify-between text-xs text-emerald-400"><span>cURL Example</span><button onclick="copyCode('code-trans', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
-                            <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-trans">curl "https://apikeyzenuth.vercel.app/api/translate?apikey=YOUR_KEY&text=halo&to=en"</pre></div>
+                            <div class="flex justify-between text-xs text-emerald-400"><span>cURL Example</span><button onclick="copyCode('code-trans-curl', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
+                            <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-trans-curl">curl "https://apikeyzenuth.vercel.app/api/translate?apikey=YOUR_KEY&text=halo&to=en"</pre></div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs text-emerald-400"><span>JavaScript (Fetch) Example</span><button onclick="copyCode('code-trans-js', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
+                            <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-trans-js">const res = await fetch('https://apikeyzenuth.vercel.app/api/translate?apikey=YOUR_KEY&text=halo&to=en');
+const data = await res.json();
+console.log(data.result);</pre></div>
                         </div>
                     </div>
                 </div>
@@ -203,9 +214,17 @@
                             </div>
                             <div id="test-result-box-bypass" class="hidden p-3 bg-emerald-950/80 rounded-xl font-mono text-xs text-emerald-300"><pre id="test-result-json-bypass"></pre></div>
                         </div>
+
                         <div class="space-y-2">
-                            <div class="flex justify-between text-xs text-emerald-400"><span>cURL Example</span><button onclick="copyCode('code-bypass', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
-                            <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-bypass">curl "https://apikeyzenuth.vercel.app/api/bypass?apikey=YOUR_KEY&url=https://sfl.gl/xxx"</pre></div>
+                            <div class="flex justify-between text-xs text-emerald-400"><span>cURL Example</span><button onclick="copyCode('code-bypass-curl', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
+                            <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-bypass-curl">curl "https://apikeyzenuth.vercel.app/api/bypass?apikey=YOUR_KEY&url=https://sfl.gl/xxx"</pre></div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs text-emerald-400"><span>JavaScript (Fetch) Example</span><button onclick="copyCode('code-bypass-js', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
+                            <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-bypass-js">const res = await fetch('https://apikeyzenuth.vercel.app/api/bypass?apikey=YOUR_KEY&url=https://sfl.gl/xxx');
+const data = await res.json();
+console.log(data.result);</pre></div>
                         </div>
                     </div>
                 </div>
@@ -230,9 +249,17 @@
                             </div>
                             <div id="test-result-box-calc" class="hidden p-3 bg-emerald-950/80 rounded-xl font-mono text-xs text-emerald-300"><pre id="test-result-json-calc"></pre></div>
                         </div>
+
                         <div class="space-y-2">
-                            <div class="flex justify-between text-xs text-emerald-400"><span>cURL Example</span><button onclick="copyCode('code-calc', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
-                            <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-calc">curl "https://apikeyzenuth.vercel.app/api/calc?apikey=YOUR_KEY&angka1=10&op=x&angka2=5"</pre></div>
+                            <div class="flex justify-between text-xs text-emerald-400"><span>cURL Example</span><button onclick="copyCode('code-calc-curl', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
+                            <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-calc-curl">curl "https://apikeyzenuth.vercel.app/api/calc?apikey=YOUR_KEY&angka1=10&op=x&angka2=5"</pre></div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs text-emerald-400"><span>JavaScript (Fetch) Example</span><button onclick="copyCode('code-calc-js', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
+                            <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-calc-js">const res = await fetch('https://apikeyzenuth.vercel.app/api/calc?apikey=YOUR_KEY&angka1=10&op=x&angka2=5');
+const data = await res.json();
+console.log(data.result);</pre></div>
                         </div>
                     </div>
                 </div>
@@ -255,9 +282,17 @@
                             </div>
                             <div id="test-result-box-para" class="hidden p-3 bg-emerald-950/80 rounded-xl font-mono text-xs text-emerald-300"><pre id="test-result-json-para"></pre></div>
                         </div>
+
                         <div class="space-y-2">
-                            <div class="flex justify-between text-xs text-emerald-400"><span>cURL Example</span><button onclick="copyCode('code-para', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
-                            <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-para">curl "https://apikeyzenuth.vercel.app/api/paraphrase?apikey=YOUR_KEY&text=halo"</pre></div>
+                            <div class="flex justify-between text-xs text-emerald-400"><span>cURL Example</span><button onclick="copyCode('code-para-curl', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
+                            <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-para-curl">curl "https://apikeyzenuth.vercel.app/api/paraphrase?apikey=YOUR_KEY&text=halo"</pre></div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs text-emerald-400"><span>JavaScript (Fetch) Example</span><button onclick="copyCode('code-para-js', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
+                            <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-para-js">const res = await fetch('https://apikeyzenuth.vercel.app/api/paraphrase?apikey=YOUR_KEY&text=halo');
+const data = await res.json();
+console.log(data.result);</pre></div>
                         </div>
                     </div>
                 </div>
@@ -280,9 +315,17 @@
                             </div>
                             <div id="test-result-box-story" class="hidden p-3 bg-emerald-950/80 rounded-xl font-mono text-xs text-emerald-300"><pre id="test-result-json-story"></pre></div>
                         </div>
+
                         <div class="space-y-2">
-                            <div class="flex justify-between text-xs text-emerald-400"><span>cURL Example</span><button onclick="copyCode('code-story', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
-                            <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-story">curl "https://apikeyzenuth.vercel.app/api/story?apikey=YOUR_KEY&topic=petualangan"</pre></div>
+                            <div class="flex justify-between text-xs text-emerald-400"><span>cURL Example</span><button onclick="copyCode('code-story-curl', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
+                            <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-story-curl">curl "https://apikeyzenuth.vercel.app/api/story?apikey=YOUR_KEY&topic=petualangan"</pre></div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs text-emerald-400"><span>JavaScript (Fetch) Example</span><button onclick="copyCode('code-story-js', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
+                            <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-story-js">const res = await fetch('https://apikeyzenuth.vercel.app/api/story?apikey=YOUR_KEY&topic=petualangan');
+const data = await res.json();
+console.log(data.result);</pre></div>
                         </div>
                     </div>
                 </div>
