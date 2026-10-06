@@ -6,32 +6,26 @@ const crypto = require('crypto');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Penanganan lokasi database sementara di Vercel Serverless
 const DB_FILE = process.env.VERCEL 
     ? path.join('/tmp', 'database.json') 
     : path.join(__dirname, 'database.json');
 
 let memoryDB = { keys: {} };
 
-// 1. PENGATURAN TERPUSAT APLIKASI
 const SITE_CONFIG = {
     siteName: 'apikeyzenuth',
     aiName: 'apikeyzenuth AI',
     themeName: 'Liquid Glass Platform',
-    defaultLimit: 100,                     // Batas limit per 24 jam
-    resetWindowMs: 24 * 60 * 60 * 1000,     // Durasi 24 jam
-    maxLogsToKeep: 50                      // Batas simpan log error
+    defaultLimit: 100,
+    resetWindowMs: 24 * 60 * 60 * 1000,
+    maxLogsToKeep: 50
 };
 
-// Konfigurasi API Key Eksternal
 const GROQ_API_KEY = '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';
 const ZENNQ_API_KEY = 'zq_eu1maz2hkr3uv319ffp2jl0shohwj2lt';
 
 const errorLogs = [];
 
-/**
- * Fungsi untuk mencatat riwayat error ke sistem log
- */
 function recordErrorLog(endpoint, message, statusCode = 400) {
     const newLog = {
         id: 'LOG-' + Date.now().toString(36).toUpperCase(),
@@ -47,15 +41,11 @@ function recordErrorLog(endpoint, message, statusCode = 400) {
     }
 }
 
-// Middleware Express
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-/**
- * Memuat database JSON lokal/sementara
- */
 function loadDB() {
     try {
         if (!fs.existsSync(DB_FILE)) {
@@ -69,9 +59,6 @@ function loadDB() {
     }
 }
 
-/**
- * Menyimpan data ke file/memori
- */
 function saveDB(data) {
     memoryDB = data;
     try {
@@ -79,9 +66,6 @@ function saveDB(data) {
     } catch (err) {}
 }
 
-/**
- * Middleware Rate Limiter & Auto Recovery Key
- */
 function checkRateLimit(req, res, next) {
     const apiKey = req.query.apikey || req.body.apikey;
 
@@ -93,7 +77,6 @@ function checkRateLimit(req, res, next) {
     const db = loadDB();
     let keyData = db.keys[apiKey];
 
-    // Pemulihan otomatis jika key SAW- terhapus akibat cold start Vercel
     if (!keyData && apiKey.startsWith('SAW-')) {
         keyData = {
             key: apiKey,
@@ -133,8 +116,6 @@ function checkRateLimit(req, res, next) {
     req.keyInfo = keyData;
     next();
 }
-
-// 2. ROUTE DAN API ENDPOINTS
 
 app.get('/', (req, res) => {
     res.render('docs', { config: SITE_CONFIG });
@@ -198,7 +179,7 @@ app.get('/api/check-key', (req, res) => {
     });
 });
 
-// Endpoint 1: AI Prompt (Groq AI)
+// Endpoint AI
 app.get('/api/ai', checkRateLimit, async (req, res) => {
     const prompt = req.query.prompt;
     if (!prompt || prompt.trim() === '') {
@@ -209,10 +190,7 @@ app.get('/api/ai', checkRateLimit, async (req, res) => {
     try {
         const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${GROQ_API_KEY}`
-            },
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
             body: JSON.stringify({
                 messages: [{ role: 'user', content: prompt }],
                 model: 'openai/gpt-oss-120b',
@@ -220,197 +198,138 @@ app.get('/api/ai', checkRateLimit, async (req, res) => {
                 max_completion_tokens: 2048,
                 top_p: 1,
                 stream: false,
-                reasoning_effort: 'medium',
-                stop: null
+                reasoning_effort: 'medium'
             })
         });
-
         const data = await groqResponse.json();
-
         if (data.choices && data.choices[0] && data.choices[0].message) {
             return res.json({
                 success: true,
                 author: SITE_CONFIG.siteName,
-                prompt: prompt,
                 result: data.choices[0].message.content.trim(),
                 usage: { usedToday: req.keyInfo.count, remaining: req.keyInfo.limit - req.keyInfo.count, limit: req.keyInfo.limit }
             });
         } else {
-            const errMsg = data.error ? data.error.message : 'Respons Groq AI tidak valid.';
-            recordErrorLog(req.originalUrl, errMsg, 500);
-            return res.status(500).json({ success: false, message: `Gagal memproses AI: ${errMsg}` });
+            return res.status(500).json({ success: false, message: 'Gagal memproses AI.' });
         }
     } catch (err) {
-        recordErrorLog(req.originalUrl, err.message, 500);
-        return res.status(500).json({ success: false, message: `Gagal memproses AI: ${err.message}` });
+        return res.status(500).json({ success: false, message: err.message });
     }
 });
 
-// Endpoint 2: Fast Translate (Google Translate GTX)
+// Endpoint Translate
 app.get('/api/translate', checkRateLimit, async (req, res) => {
     const { text, to } = req.query;
-    if (!text || text.trim() === '') {
-        recordErrorLog(req.originalUrl, 'Parameter text kosong', 400);
-        return res.status(400).json({ success: false, message: 'Parameter text tidak boleh kosong!' });
-    }
-    const targetLang = to || 'en';
+    if (!text) return res.status(400).json({ success: false, message: 'Parameter text wajib diisi.' });
     try {
-        const gtxUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${encodeURIComponent(targetLang)}&dt=t&q=${encodeURIComponent(text)}`;
-        const response = await fetch(gtxUrl);
+        const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${encodeURIComponent(to || 'en')}&dt=t&q=${encodeURIComponent(text)}`);
         const data = await response.json();
-
-        if (data && data[0]) {
-            const translatedText = data[0].map(item => item[0]).filter(Boolean).join('');
-            return res.json({
-                success: true,
-                author: SITE_CONFIG.siteName,
-                originalText: text,
-                targetLanguage: targetLang,
-                result: translatedText,
-                usage: { usedToday: req.keyInfo.count, remaining: req.keyInfo.limit - req.keyInfo.count, limit: req.keyInfo.limit }
-            });
-        } else {
-            recordErrorLog(req.originalUrl, 'Gagal mengambil data translator', 500);
-            return res.status(500).json({ success: false, message: 'Gagal memproses terjemahan.' });
-        }
+        const translatedText = data[0].map(item => item[0]).filter(Boolean).join('');
+        return res.json({ success: true, result: translatedText });
     } catch (err) {
-        recordErrorLog(req.originalUrl, err.message, 500);
-        return res.status(500).json({ success: false, message: `Gagal memproses terjemahan: ${err.message}` });
+        return res.status(500).json({ success: false, message: err.message });
     }
 });
 
-// Endpoint 3: Shortlink Bypass (Zennq)
+// Endpoint Bypass
 app.get('/api/bypass', checkRateLimit, async (req, res) => {
-    const targetUrl = req.query.url;
-    if (!targetUrl || targetUrl.trim() === '') {
-        recordErrorLog(req.originalUrl, 'Parameter url kosong', 400);
-        return res.status(400).json({ success: false, message: 'Parameter url tidak boleh kosong!' });
-    }
-
+    const url = req.query.url;
+    if (!url) return res.status(400).json({ success: false, message: 'Parameter url wajib diisi.' });
     try {
-        const bypassResponse = await fetch('https://zennq.my.id/api/bypass', {
+        const response = await fetch('https://zennq.my.id/api/bypass', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'x-api-key': ZENNQ_API_KEY },
-            body: JSON.stringify({ url: targetUrl })
+            body: JSON.stringify({ url })
         });
-        const data = await bypassResponse.json();
-
-        if (data && data.data && data.data.bypassedUrl) {
-            return res.json({
-                success: true,
-                author: SITE_CONFIG.siteName,
-                originalUrl: targetUrl,
-                result: data.data.bypassedUrl,
-                usage: { usedToday: req.keyInfo.count, remaining: req.keyInfo.limit - req.keyInfo.count, limit: req.keyInfo.limit }
-            });
-        } else {
-            const errMsg = data.message || 'Gagal melewati shortlink.';
-            recordErrorLog(req.originalUrl, errMsg, 500);
-            return res.status(500).json({ success: false, message: `Gagal bypass URL: ${errMsg}` });
-        }
+        const data = await response.json();
+        return res.json({ success: true, result: data.data?.bypassedUrl || 'Gagal bypass' });
     } catch (err) {
-        recordErrorLog(req.originalUrl, err.message, 500);
-        return res.status(500).json({ success: false, message: `Gagal memproses bypass: ${err.message}` });
+        return res.status(500).json({ success: false, message: err.message });
     }
 });
 
-// Endpoint 4: Kalkulator
+// Endpoint Calc
 app.get('/api/calc', checkRateLimit, (req, res) => {
     let { angka1, op, angka2 } = req.query;
-
-    if (angka1 === undefined || op === undefined || angka2 === undefined) {
-        recordErrorLog(req.originalUrl, 'Parameter kalkulator tidak lengkap', 400);
-        return res.status(400).json({ success: false, message: 'Parameter angka1, op (+, -, x, :), dan angka2 wajib diisi!' });
-    }
-
-    const num1 = parseFloat(angka1);
-    const num2 = parseFloat(angka2);
-
-    if (isNaN(num1) || isNaN(num2)) {
-        recordErrorLog(req.originalUrl, 'Format angka kalkulator tidak valid', 400);
-        return res.status(400).json({ success: false, message: 'angka1 dan angka2 harus berupa angka yang valid!' });
-    }
-
+    const n1 = parseFloat(angka1), n2 = parseFloat(angka2);
+    if (isNaN(n1) || isNaN(n2)) return res.status(400).json({ success: false, message: 'Angka tidak valid' });
     let hasil = 0;
-    switch (op) {
-        case '+': hasil = num1 + num2; break;
-        case '-': hasil = num1 - num2; break;
-        case 'x': case 'X': case '*': hasil = num1 * num2; break;
-        case ':': case '/':
-            if (num2 === 0) {
-                recordErrorLog(req.originalUrl, 'Pembagian dengan nol', 400);
-                return res.status(400).json({ success: false, message: 'Kesalahan: Tidak dapat membagi angka dengan nol (0)!' });
-            }
-            hasil = num1 / num2;
-            break;
-        default:
-            recordErrorLog(req.originalUrl, `Operator tidak dikenal: ${op}`, 400);
-            return res.status(400).json({ success: false, message: 'Operator tidak valid! Gunakan "+", "-", "x", atau ":".' });
-    }
-
-    return res.json({
-        success: true,
-        author: SITE_CONFIG.siteName,
-        operasi: `${num1} ${op} ${num2}`,
-        result: hasil,
-        usage: { usedToday: req.keyInfo.count, remaining: req.keyInfo.limit - req.keyInfo.count, limit: req.keyInfo.limit }
-    });
+    if (op === '+') hasil = n1 + n2;
+    else if (op === '-') hasil = n1 - n2;
+    else if (op === 'x' || op === '*') hasil = n1 * n2;
+    else if (op === ':' || op === '/') hasil = n1 / n2;
+    return res.json({ success: true, result: hasil });
 });
 
-// Endpoint 5: Paraphrase (Groq AI)
+// Endpoint Paraphrase
 app.get('/api/paraphrase', checkRateLimit, async (req, res) => {
     const text = req.query.text;
-    if (!text || text.trim() === '') {
-        recordErrorLog(req.originalUrl, 'Parameter text kosong pada paraphrase', 400);
-        return res.status(400).json({ success: false, message: 'Parameter text tidak boleh kosong!' });
-    }
-
-    const prompt = `Parafrase atau ubah kalimat berikut agar memiliki susunan kata yang berbeda namun tetap mempertahankan makna aslinya. Berikan hasil parafrasenya saja:\n\n"${text}"`;
-
+    if (!text) return res.status(400).json({ success: false, message: 'Parameter text wajib diisi.' });
     try {
         const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
             body: JSON.stringify({
-                messages: [{ role: 'user', content: prompt }],
+                messages: [{ role: 'user', content: `Parafrase kalimat berikut:\n\n"${text}"` }],
                 model: 'openai/gpt-oss-120b',
                 temperature: 1,
                 max_completion_tokens: 2048,
-                top_p: 1,
-                stream: false,
-                reasoning_effort: 'medium'
+                stream: false
             })
         });
         const data = await groqResponse.json();
-
-        if (data.choices && data.choices[0] && data.choices[0].message) {
-            return res.json({
-                success: true,
-                author: SITE_CONFIG.siteName,
-                originalText: text,
-                result: data.choices[0].message.content.trim(),
-                usage: { usedToday: req.keyInfo.count, remaining: req.keyInfo.limit - req.keyInfo.count, limit: req.keyInfo.limit }
-            });
-        } else {
-            const errMsg = data.error ? data.error.message : 'Gagal memproses parafrase.';
-            recordErrorLog(req.originalUrl, errMsg, 500);
-            return res.status(500).json({ success: false, message: `Gagal paraphrase: ${errMsg}` });
-        }
+        return res.json({ success: true, result: data.choices[0].message.content.trim() });
     } catch (err) {
-        recordErrorLog(req.originalUrl, err.message, 500);
-        return res.status(500).json({ success: false, message: `Gagal paraphrase: ${err.message}` });
+        return res.status(500).json({ success: false, message: err.message });
     }
 });
 
-// Endpoint 6: Story Generator / Cerpen (Groq AI)
+// Endpoint Story
 app.get('/api/story', checkRateLimit, async (req, res) => {
     const topic = req.query.topic;
-    if (!topic || topic.trim() === '') {
-        recordErrorLog(req.originalUrl, 'Parameter topic kosong pada story', 400);
-        return res.status(400).json({ success: false, message: 'Parameter topic tidak boleh kosong!' });
+    if (!topic) return res.status(400).json({ success: false, message: 'Parameter topic wajib diisi.' });
+    try {
+        const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
+            body: JSON.stringify({
+                messages: [{ role: 'user', content: `Buatkan cerpen bertema: "${topic}"` }],
+                model: 'openai/gpt-oss-120b',
+                temperature: 1,
+                max_completion_tokens: 2048,
+                stream: false
+            })
+        });
+        const data = await groqResponse.json();
+        return res.json({ success: true, result: data.choices[0].message.content.trim() });
+    } catch (err) {
+        return res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// Endpoint Character Story (CS SA-MP) Sesuai Gambar Referensi
+app.get('/api/character-story', checkRateLimit, async (req, res) => {
+    const { nama, tanggalLahir, asal, catatan, latarBelakang, vibe, bahasa, paragraf } = req.query;
+
+    if (!nama || !tanggalLahir || !asal) {
+        recordErrorLog(req.originalUrl, 'Parameter karakter tidak lengkap', 400);
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Parameter nama, tanggalLahir, dan asal wajib diisi sesuai form!' 
+        });
     }
 
-    const prompt = `Buatkan sebuah cerita pendek (cerpen) yang menarik, kreatif, dan bermakna berdasarkan tema atau judul berikut:\n\n"${topic}"`;
+    const prompt = `Buatkan sebuah Character Story (CS) Roleplay SA-MP yang sangat imersif, mendalam, dan sesuai standar server roleplay berkualitas tinggi berdasarkan detail berikut:
+- Nama Karakter (IC): ${nama}
+- Tahun / Tanggal Lahir: ${tanggalLahir}
+- Asal / Kewarganegaraan: ${asal}
+- Latar Belakang Kehidupan: ${latarBelakang || 'Umum'}
+- Vibe Kepribadian: ${vibe || 'Netral'}
+- Bahasa Cerita: ${bahasa || 'Indonesia'}
+- Jumlah Paragraf: ${paragraf || '4 Paragraf'}
+- Catatan Tambahan / Alur Khusus: ${catatan || 'Tidak ada catatan khusus, kembangkan secara kreatif.'}
+
+Pastikan struktur cerita rapi sesuai jumlah paragraf yang diminta.`;
 
     try {
         const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -420,30 +339,31 @@ app.get('/api/story', checkRateLimit, async (req, res) => {
                 messages: [{ role: 'user', content: prompt }],
                 model: 'openai/gpt-oss-120b',
                 temperature: 1,
-                max_completion_tokens: 2048,
+                max_completion_tokens: 3000,
                 top_p: 1,
                 stream: false,
                 reasoning_effort: 'medium'
             })
         });
+
         const data = await groqResponse.json();
 
         if (data.choices && data.choices[0] && data.choices[0].message) {
             return res.json({
                 success: true,
                 author: SITE_CONFIG.siteName,
-                topic: topic,
+                characterDetails: { nama, tanggalLahir, asal, latarBelakang, vibe, bahasa, paragraf, catatan },
                 result: data.choices[0].message.content.trim(),
                 usage: { usedToday: req.keyInfo.count, remaining: req.keyInfo.limit - req.keyInfo.count, limit: req.keyInfo.limit }
             });
         } else {
-            const errMsg = data.error ? data.error.message : 'Gagal membuat cerita.';
+            const errMsg = data.error ? data.error.message : 'Gagal menghasilkan Character Story.';
             recordErrorLog(req.originalUrl, errMsg, 500);
-            return res.status(500).json({ success: false, message: `Gagal membuat cerita: ${errMsg}` });
+            return res.status(500).json({ success: false, message: errMsg });
         }
     } catch (err) {
         recordErrorLog(req.originalUrl, err.message, 500);
-        return res.status(500).json({ success: false, message: `Gagal membuat cerita: ${err.message}` });
+        return res.status(500).json({ success: false, message: err.message });
     }
 });
 
