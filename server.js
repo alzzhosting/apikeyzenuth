@@ -6,27 +6,32 @@ const crypto = require('crypto');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Penanganan lokasi database sementara di Vercel Serverless
 const DB_FILE = process.env.VERCEL 
     ? path.join('/tmp', 'database.json') 
     : path.join(__dirname, 'database.json');
 
 let memoryDB = { keys: {} };
 
+// 1. PENGATURAN TERPUSAT APLIKASI
 const SITE_CONFIG = {
     siteName: 'apikeyzenuth',
     aiName: 'apikeyzenuth AI',
     themeName: 'Liquid Glass Platform',
-    defaultLimit: 100,
-    resetWindowMs: 24 * 60 * 60 * 1000,
-    maxLogsToKeep: 50
+    defaultLimit: 100,                     // Batas limit per 24 jam
+    resetWindowMs: 24 * 60 * 60 * 1000,     // Durasi 24 jam
+    maxLogsToKeep: 50                      // Batas simpan log error
 };
 
-// Groq API Key dan konfigurasi model baru
+// Konfigurasi API Key Eksternal
 const GROQ_API_KEY = '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';
 const ZENNQ_API_KEY = 'zq_eu1maz2hkr3uv319ffp2jl0shohwj2lt';
 
 const errorLogs = [];
 
+/**
+ * Fungsi untuk mencatat riwayat error ke sistem log
+ */
 function recordErrorLog(endpoint, message, statusCode = 400) {
     const newLog = {
         id: 'LOG-' + Date.now().toString(36).toUpperCase(),
@@ -42,11 +47,15 @@ function recordErrorLog(endpoint, message, statusCode = 400) {
     }
 }
 
+// Middleware Express
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
+/**
+ * Memuat database JSON lokal/sementara
+ */
 function loadDB() {
     try {
         if (!fs.existsSync(DB_FILE)) {
@@ -60,6 +69,9 @@ function loadDB() {
     }
 }
 
+/**
+ * Menyimpan data ke file/memori
+ */
 function saveDB(data) {
     memoryDB = data;
     try {
@@ -67,6 +79,9 @@ function saveDB(data) {
     } catch (err) {}
 }
 
+/**
+ * Middleware Rate Limiter & Auto Recovery Key
+ */
 function checkRateLimit(req, res, next) {
     const apiKey = req.query.apikey || req.body.apikey;
 
@@ -78,6 +93,7 @@ function checkRateLimit(req, res, next) {
     const db = loadDB();
     let keyData = db.keys[apiKey];
 
+    // Pemulihan otomatis jika key SAW- terhapus akibat cold start Vercel
     if (!keyData && apiKey.startsWith('SAW-')) {
         keyData = {
             key: apiKey,
@@ -117,6 +133,8 @@ function checkRateLimit(req, res, next) {
     req.keyInfo = keyData;
     next();
 }
+
+// 2. ROUTE DAN API ENDPOINTS
 
 app.get('/', (req, res) => {
     res.render('docs', { config: SITE_CONFIG });
@@ -180,7 +198,7 @@ app.get('/api/check-key', (req, res) => {
     });
 });
 
-// Endpoint 1: AI Prompt menggunakan Groq API
+// Endpoint 1: AI Prompt (Groq AI)
 app.get('/api/ai', checkRateLimit, async (req, res) => {
     const prompt = req.query.prompt;
     if (!prompt || prompt.trim() === '') {
@@ -201,7 +219,7 @@ app.get('/api/ai', checkRateLimit, async (req, res) => {
                 temperature: 1,
                 max_completion_tokens: 2048,
                 top_p: 1,
-                stream: false, // Diubah ke false agar server Express bisa langsung merespons JSON utuh ke client
+                stream: false,
                 reasoning_effort: 'medium',
                 stop: null
             })
@@ -228,7 +246,7 @@ app.get('/api/ai', checkRateLimit, async (req, res) => {
     }
 });
 
-// Endpoint 2: Fast Translate
+// Endpoint 2: Fast Translate (Google Translate GTX)
 app.get('/api/translate', checkRateLimit, async (req, res) => {
     const { text, to } = req.query;
     if (!text || text.trim() === '') {
@@ -261,7 +279,7 @@ app.get('/api/translate', checkRateLimit, async (req, res) => {
     }
 });
 
-// Endpoint 3: Shortlink Bypass
+// Endpoint 3: Shortlink Bypass (Zennq)
 app.get('/api/bypass', checkRateLimit, async (req, res) => {
     const targetUrl = req.query.url;
     if (!targetUrl || targetUrl.trim() === '') {
@@ -339,7 +357,7 @@ app.get('/api/calc', checkRateLimit, (req, res) => {
     });
 });
 
-// Endpoint 5: Paraphrase
+// Endpoint 5: Paraphrase (Groq AI)
 app.get('/api/paraphrase', checkRateLimit, async (req, res) => {
     const text = req.query.text;
     if (!text || text.trim() === '') {
@@ -384,7 +402,7 @@ app.get('/api/paraphrase', checkRateLimit, async (req, res) => {
     }
 });
 
-// Endpoint 6: Story Generator / Cerpen
+// Endpoint 6: Story Generator / Cerpen (Groq AI)
 app.get('/api/story', checkRateLimit, async (req, res) => {
     const topic = req.query.topic;
     if (!topic || topic.trim() === '') {
