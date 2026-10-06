@@ -25,71 +25,71 @@
 
     <style>
         body {
-            background-color: #0c0a09;
+            background-color: #050b08; /* Hitam kehijauan gelap */
             background-image: 
-                radial-gradient(at 10% 10%, rgba(245, 158, 11, 0.15) 0px, transparent 40%),
-                radial-gradient(at 90% 90%, rgba(234, 88, 12, 0.12) 0px, transparent 40%);
+                radial-gradient(at 10% 10%, rgba(16, 185, 129, 0.12) 0px, transparent 40%),
+                radial-gradient(at 90% 90%, rgba(5, 150, 105, 0.08) 0px, transparent 40%);
             background-attachment: fixed;
         }
 
         .liquid-glass {
-            background: rgba(28, 25, 23, 0.55);
+            background: rgba(6, 23, 16, 0.55);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(251, 191, 36, 0.18);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(52, 211, 153, 0.2); /* Hijau neon tipis */
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.05);
         }
 
         .liquid-glass-glow {
-            background: rgba(28, 25, 23, 0.7);
+            background: rgba(6, 23, 16, 0.7);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            box-shadow: 0 0 30px rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            box-shadow: 0 0 35px rgba(16, 185, 129, 0.12);
         }
 
         #sidebar { transition: transform 0.3s ease-in-out; }
 
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0c0a09; }
-        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
+        ::-webkit-scrollbar-track { background: #050b08; }
+        ::-webkit-scrollbar-thumb { background: #064e3b; border-radius: 3px; }
     </style>
 </head>
-<body class="font-sans text-stone-200 min-h-screen flex flex-col justify-between p-4 sm:p-8">
+<body class="font-sans text-emerald-100 min-h-screen flex flex-col justify-between p-4 sm:p-8">
 
     <!-- OVERLAY SIDEBAR -->
-    <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
+    <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 hidden transition-opacity"></div>
 
     <!-- SIDEBAR NAVIGASI -->
-    <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-stone-950/95 border-r border-amber-500/20 z-50 transform -translate-x-full p-6 flex flex-col justify-between shadow-2xl liquid-glass">
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-stone-950/95 border-r border-emerald-500/20 z-50 transform -translate-x-full p-6 flex flex-col justify-between shadow-2xl liquid-glass">
         <div>
-            <div class="flex items-center justify-between pb-6 border-b border-stone-800">
+            <div class="flex items-center justify-between pb-6 border-b border-emerald-900/50">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-black font-extrabold text-sm shadow-md">
+                    <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-black font-extrabold text-sm shadow-md">
                         <i class="fa-solid fa-bolt"></i>
                     </div>
                     <span class="font-extrabold text-white text-sm tracking-wide"><%= config.siteName %></span>
                 </div>
-                <button onclick="toggleSidebar()" class="text-stone-400 hover:text-white p-2">
+                <button onclick="toggleSidebar()" class="text-emerald-400 hover:text-white p-2">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
 
             <nav class="mt-6 space-y-2">
-                <button onclick="switchTab('docs')" id="nav-docs" class="w-full text-left px-4 py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-3 bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                <button onclick="switchTab('docs')" id="nav-docs" class="w-full text-left px-4 py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-3 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                     <i class="fa-solid fa-code text-lg"></i> Dokumentasi API
                 </button>
-                <button onclick="switchTab('settings')" id="nav-settings" class="w-full text-left px-4 py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-3 text-stone-400 hover:bg-stone-800/60 hover:text-white">
+                <button onclick="switchTab('settings')" id="nav-settings" class="w-full text-left px-4 py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-3 text-emerald-400/70 hover:bg-emerald-950/40 hover:text-white">
                     <i class="fa-solid fa-sliders text-lg"></i> Pengaturan & Limit Key
                 </button>
-                <button onclick="switchTab('logs')" id="nav-logs" class="w-full text-left px-4 py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-3 text-stone-400 hover:bg-stone-800/60 hover:text-white">
+                <button onclick="switchTab('logs')" id="nav-logs" class="w-full text-left px-4 py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-3 text-emerald-400/70 hover:bg-emerald-950/40 hover:text-white">
                     <i class="fa-solid fa-bug text-lg text-rose-400"></i> Error Logs Viewer
                 </button>
             </nav>
         </div>
 
-        <div class="text-xs text-stone-500 text-center border-t border-stone-800 pt-4 font-mono">
-            <%= config.siteName %> &bull; Liquid Glass
+        <div class="text-xs text-emerald-500/60 text-center border-t border-emerald-900/50 pt-4 font-mono">
+            <%= config.siteName %> &bull; Neon Green Glass
         </div>
     </aside>
 
@@ -99,20 +99,20 @@
         <!-- TOPBAR HEADER -->
         <header class="flex items-center justify-between liquid-glass p-5 rounded-3xl">
             <div class="flex items-center gap-4">
-                <button onclick="toggleSidebar()" class="p-3 bg-stone-900 hover:bg-stone-800 border border-amber-500/30 text-amber-400 rounded-2xl transition flex items-center gap-2">
+                <button onclick="toggleSidebar()" class="p-3 bg-emerald-950/50 hover:bg-emerald-900/50 border border-emerald-500/30 text-emerald-400 rounded-2xl transition flex items-center gap-2">
                     <i class="fa-solid fa-bars text-lg"></i>
-                    <span class="text-xs font-bold text-stone-200 hidden sm:inline">Menu Navigasi</span>
+                    <span class="text-xs font-bold text-emerald-200 hidden sm:inline">Menu Navigasi</span>
                 </button>
 
                 <div>
                     <h1 class="font-extrabold text-base sm:text-lg text-white tracking-wide"><%= config.siteName %></h1>
-                    <p class="text-xs text-stone-400 hidden sm:block">Platform Rest API Suite</p>
+                    <p class="text-xs text-emerald-400/70 hidden sm:block">Platform Rest API Suite</p>
                 </div>
             </div>
 
             <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-xs font-mono text-stone-400 font-semibold">Online</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_10px_#34d399]"></span>
+                <span class="text-xs font-mono text-emerald-300 font-semibold">Online</span>
             </div>
         </header>
 
@@ -121,220 +121,257 @@
             <div class="liquid-glass p-6 sm:p-8 rounded-3xl space-y-6">
                 <div>
                     <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-cubes text-amber-400"></i> Daftar Endpoint & Contoh Integrasi
+                        <i class="fa-solid fa-cubes text-emerald-400"></i> Daftar Endpoint & Contoh Integrasi
                     </h2>
-                    <p class="text-stone-400 text-xs sm:text-sm mt-1">Klik pada nama endpoint untuk melihat parameter, uji coba langsung, dan contoh salinan kode.</p>
+                    <p class="text-emerald-300/70 text-xs sm:text-sm mt-1">Klik pada nama endpoint untuk melihat parameter, uji coba langsung, dan contoh salinan kode.</p>
                 </div>
 
                 <!-- ENDPOINT 1: AI PROMPT -->
-                <div class="rounded-2xl bg-stone-950/60 border border-stone-800 overflow-hidden">
-                    <button onclick="toggleAccordion('ai')" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-stone-900/60 transition text-left">
+                <div class="rounded-2xl bg-emerald-950/30 border border-emerald-900/50 overflow-hidden">
+                    <button onclick="toggleAccordion('ai')" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-emerald-900/20 transition text-left">
                         <div class="flex items-center gap-3 font-mono text-xs sm:text-sm">
-                            <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">GET</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">GET</span>
                             <span class="text-white font-bold">/api/ai</span>
-                            <span class="text-stone-400 text-xs hidden sm:inline">- AI Engine</span>
+                            <span class="text-emerald-400/60 text-xs hidden sm:inline">- Groq AI Prompt</span>
                         </div>
-                        <i id="accordion-icon-ai" class="fa-solid fa-chevron-right text-amber-400 text-sm transition-transform duration-300"></i>
+                        <i id="accordion-icon-ai" class="fa-solid fa-chevron-right text-emerald-400 text-sm transition-transform duration-300"></i>
                     </button>
 
-                    <div id="accordion-content-ai" class="hidden p-5 border-t border-stone-800/80 space-y-6 bg-stone-950/40">
+                    <div id="accordion-content-ai" class="hidden p-5 border-t border-emerald-900/40 space-y-6 bg-emerald-950/20">
                         <div class="space-y-2">
-                            <span class="text-xs font-bold uppercase tracking-wider text-stone-400 block">Parameter Request</span>
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400/80 block">Parameter Request</span>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left text-xs font-mono">
-                                    <thead class="bg-stone-900 text-stone-400 border-b border-stone-800">
+                                    <thead class="bg-emerald-950 text-emerald-400 border-b border-emerald-900">
                                         <tr><th class="p-2.5">Parameter</th><th class="p-2.5">Tipe</th><th class="p-2.5">Wajib</th><th class="p-2.5">Keterangan</th></tr>
                                     </thead>
-                                    <tbody class="divide-y divide-stone-800/60 text-stone-300">
-                                        <tr><td class="p-2.5 text-amber-400 font-bold">apikey</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-400">Ya</td><td class="p-2.5">Kunci API milikmu.</td></tr>
-                                        <tr><td class="p-2.5 text-amber-400 font-bold">prompt</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-400">Ya</td><td class="p-2.5">Pertanyaan untuk AI.</td></tr>
+                                    <tbody class="divide-y divide-emerald-900/30 text-emerald-200">
+                                        <tr><td class="p-2.5 text-emerald-400 font-bold">apikey</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-300">Ya</td><td class="p-2.5">Kunci API milikmu.</td></tr>
+                                        <tr><td class="p-2.5 text-emerald-400 font-bold">prompt</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-300">Ya</td><td class="p-2.5">Pertanyaan untuk AI.</td></tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
 
                         <!-- PLAYGROUND AI -->
-                        <div class="pt-4 border-t border-stone-800/80 space-y-3">
-                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Uji Coba Langsung AI</span>
+                        <div class="pt-4 border-t border-emerald-900/40 space-y-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 block">Uji Coba Langsung AI</span>
                             <div class="flex flex-col sm:flex-row gap-2">
-                                <input type="text" id="test-prompt-ai" placeholder="Tanya sesuatu..." class="w-full bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500 font-mono">
-                                <button onclick="testAiApi()" class="px-5 py-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 whitespace-nowrap">
-                                    <i class="fa-solid fa-paper-plane"></i> Kirim
-                                </button>
+                                <input type="text" id="test-prompt-ai" placeholder="Tanya sesuatu..." class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-white focus:outline-none focus:border-emerald-400 font-mono">
+                                <button onclick="testAiApi()" class="px-5 py-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold transition whitespace-nowrap"><i class="fa-solid fa-paper-plane"></i> Kirim</button>
                             </div>
-                            <div id="test-result-box-ai" class="hidden p-4 bg-stone-950 rounded-xl border border-stone-800 font-mono text-xs text-emerald-400 overflow-x-auto">
-                                <pre id="test-result-json-ai">// Jawaban AI muncul di sini</pre>
-                            </div>
-                        </div>
-
-                        <!-- SNIPPETS AI -->
-                        <div class="pt-4 border-t border-stone-800/80 space-y-4">
-                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Contoh Kode Integrasi</span>
-                            <div class="space-y-1.5">
-                                <div class="flex justify-between items-center text-xs font-mono text-stone-400">
-                                    <span>cURL</span>
-                                    <button onclick="copyCode('code-curl-ai', this)" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-[10px] font-bold transition"><i class="fa-solid fa-copy"></i> Copy</button>
-                                </div>
-                                <div class="p-3 bg-stone-950 rounded-xl border border-stone-800/80 font-mono text-xs text-emerald-400 overflow-x-auto">
-                                    <pre id="code-curl-ai">curl "https://apikeyzenuth.vercel.app/api/ai?apikey=YOUR_API_KEY&prompt=halo"</pre>
-                                </div>
+                            <div id="test-result-box-ai" class="hidden p-4 bg-emerald-950/80 rounded-xl border border-emerald-900 font-mono text-xs text-emerald-300 overflow-x-auto">
+                                <pre id="test-result-json-ai">// Jawaban AI</pre>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- ENDPOINT 2: TRANSLATOR -->
-                <div class="rounded-2xl bg-stone-950/60 border border-stone-800 overflow-hidden">
-                    <button onclick="toggleAccordion('translate')" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-stone-900/60 transition text-left">
+                <!-- ENDPOINT 2: TRANSLATE -->
+                <div class="rounded-2xl bg-emerald-950/30 border border-emerald-900/50 overflow-hidden">
+                    <button onclick="toggleAccordion('translate')" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-emerald-900/20 transition text-left">
                         <div class="flex items-center gap-3 font-mono text-xs sm:text-sm">
-                            <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">GET</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">GET</span>
                             <span class="text-white font-bold">/api/translate</span>
-                            <span class="text-stone-400 text-xs hidden sm:inline">- Fast Translator</span>
+                            <span class="text-emerald-400/60 text-xs hidden sm:inline">- Fast Translator</span>
                         </div>
-                        <i id="accordion-icon-translate" class="fa-solid fa-chevron-right text-amber-400 text-sm transition-transform duration-300"></i>
+                        <i id="accordion-icon-translate" class="fa-solid fa-chevron-right text-emerald-400 text-sm transition-transform duration-300"></i>
                     </button>
 
-                    <div id="accordion-content-translate" class="hidden p-5 border-t border-stone-800/80 space-y-6 bg-stone-950/40">
+                    <div id="accordion-content-translate" class="hidden p-5 border-t border-emerald-900/40 space-y-6 bg-emerald-950/20">
                         <div class="space-y-2">
-                            <span class="text-xs font-bold uppercase tracking-wider text-stone-400 block">Parameter Request</span>
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400/80 block">Parameter Request</span>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left text-xs font-mono">
-                                    <thead class="bg-stone-900 text-stone-400 border-b border-stone-800">
+                                    <thead class="bg-emerald-950 text-emerald-400 border-b border-emerald-900">
                                         <tr><th class="p-2.5">Parameter</th><th class="p-2.5">Tipe</th><th class="p-2.5">Wajib</th><th class="p-2.5">Keterangan</th></tr>
                                     </thead>
-                                    <tbody class="divide-y divide-stone-800/60 text-stone-300">
-                                        <tr><td class="p-2.5 text-amber-400 font-bold">apikey</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-400">Ya</td><td class="p-2.5">Kunci API milikmu.</td></tr>
-                                        <tr><td class="p-2.5 text-amber-400 font-bold">text</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-400">Ya</td><td class="p-2.5">Teks yang diterjemahkan.</td></tr>
-                                        <tr><td class="p-2.5 text-amber-400 font-bold">to</td><td class="p-2.5">String</td><td class="p-2.5 text-amber-400">Opsional</td><td class="p-2.5">Kode bahasa tujuan (default: en).</td></tr>
+                                    <tbody class="divide-y divide-emerald-900/30 text-emerald-200">
+                                        <tr><td class="p-2.5 text-emerald-400 font-bold">apikey</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-300">Ya</td><td class="p-2.5">Kunci API.</td></tr>
+                                        <tr><td class="p-2.5 text-emerald-400 font-bold">text</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-300">Ya</td><td class="p-2.5">Teks yang diterjemahkan.</td></tr>
+                                        <tr><td class="p-2.5 text-emerald-400 font-bold">to</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-300">Opsional</td><td class="p-2.5">Bahasa tujuan (default: en).</td></tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
 
                         <!-- PLAYGROUND TRANSLATE -->
-                        <div class="pt-4 border-t border-stone-800/80 space-y-3">
-                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Uji Coba Langsung Translator</span>
+                        <div class="pt-4 border-t border-emerald-900/40 space-y-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 block">Uji Coba Langsung Translator</span>
                             <div class="flex flex-col sm:flex-row gap-2">
-                                <input type="text" id="test-text-trans" placeholder="Teks..." class="w-full bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500 font-mono">
-                                <select id="test-to-trans" class="bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-amber-400 font-mono">
-                                    <option value="en">Inggris (en)</option>
-                                    <option value="ja">Jepang (ja)</option>
-                                    <option value="id">Indonesia (id)</option>
-                                    <option value="ko">Korea (ko)</option>
-                                    <option value="ar">Arab (ar)</option>
+                                <input type="text" id="test-text-trans" placeholder="Teks..." class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-white font-mono">
+                                <select id="test-to-trans" class="bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-emerald-300 font-mono">
+                                    <option value="en">Inggris</option><option value="ja">Jepang</option><option value="id">Indonesia</option><option value="ko">Korea</option>
                                 </select>
-                                <button onclick="testTranslateApi()" class="px-5 py-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold transition whitespace-nowrap"><i class="fa-solid fa-language"></i> Terjemahkan</button>
+                                <button onclick="testTranslateApi()" class="px-5 py-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold transition whitespace-nowrap"><i class="fa-solid fa-language"></i> Terjemahkan</button>
                             </div>
-                            <div id="test-result-box-trans" class="hidden p-4 bg-stone-950 rounded-xl border border-stone-800 font-mono text-xs text-emerald-400 overflow-x-auto">
+                            <div id="test-result-box-trans" class="hidden p-4 bg-emerald-950/80 rounded-xl border border-emerald-900 font-mono text-xs text-emerald-300 overflow-x-auto">
                                 <pre id="test-result-json-trans">// Hasil Terjemahan</pre>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- ENDPOINT 3: SHORTLINK BYPASS -->
-                <div class="rounded-2xl bg-stone-950/60 border border-stone-800 overflow-hidden">
-                    <button onclick="toggleAccordion('bypass')" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-stone-900/60 transition text-left">
+                <!-- ENDPOINT 3: BYPASS -->
+                <div class="rounded-2xl bg-emerald-950/30 border border-emerald-900/50 overflow-hidden">
+                    <button onclick="toggleAccordion('bypass')" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-emerald-900/20 transition text-left">
                         <div class="flex items-center gap-3 font-mono text-xs sm:text-sm">
-                            <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">GET</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">GET</span>
                             <span class="text-white font-bold">/api/bypass</span>
-                            <span class="text-stone-400 text-xs hidden sm:inline">- Bypass Engine</span>
+                            <span class="text-emerald-400/60 text-xs hidden sm:inline">- Bypass Engine</span>
                         </div>
-                        <i id="accordion-icon-bypass" class="fa-solid fa-chevron-right text-amber-400 text-sm transition-transform duration-300"></i>
+                        <i id="accordion-icon-bypass" class="fa-solid fa-chevron-right text-emerald-400 text-sm transition-transform duration-300"></i>
                     </button>
 
-                    <div id="accordion-content-bypass" class="hidden p-5 border-t border-stone-800/80 space-y-6 bg-stone-950/40">
+                    <div id="accordion-content-bypass" class="hidden p-5 border-t border-emerald-900/40 space-y-6 bg-emerald-950/20">
                         <div class="space-y-2">
-                            <span class="text-xs font-bold uppercase tracking-wider text-stone-400 block">Parameter Request</span>
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400/80 block">Parameter Request</span>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left text-xs font-mono">
-                                    <thead class="bg-stone-900 text-stone-400 border-b border-stone-800">
+                                    <thead class="bg-emerald-950 text-emerald-400 border-b border-emerald-900">
                                         <tr><th class="p-2.5">Parameter</th><th class="p-2.5">Tipe</th><th class="p-2.5">Wajib</th><th class="p-2.5">Keterangan</th></tr>
                                     </thead>
-                                    <tbody class="divide-y divide-stone-800/60 text-stone-300">
-                                        <tr><td class="p-2.5 text-amber-400 font-bold">apikey</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-400">Ya</td><td class="p-2.5">Kunci API milikmu.</td></tr>
-                                        <tr><td class="p-2.5 text-amber-400 font-bold">url</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-400">Ya</td><td class="p-2.5">Tautan shortlink target.</td></tr>
+                                    <tbody class="divide-y divide-emerald-900/30 text-emerald-200">
+                                        <tr><td class="p-2.5 text-emerald-400 font-bold">apikey</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-300">Ya</td><td class="p-2.5">Kunci API.</td></tr>
+                                        <tr><td class="p-2.5 text-emerald-400 font-bold">url</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-300">Ya</td><td class="p-2.5">URL shortlink.</td></tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
 
                         <!-- PLAYGROUND BYPASS -->
-                        <div class="pt-4 border-t border-stone-800/80 space-y-3">
-                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Uji Coba Langsung Bypass</span>
+                        <div class="pt-4 border-t border-emerald-900/40 space-y-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 block">Uji Coba Langsung Bypass</span>
                             <div class="flex flex-col sm:flex-row gap-2">
-                                <input type="text" id="test-url-bypass" placeholder="https://sfl.gl/xxx" class="w-full bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500 font-mono">
-                                <button onclick="testBypassApi()" class="px-5 py-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold transition whitespace-nowrap"><i class="fa-solid fa-link-slash"></i> Bypass</button>
+                                <input type="text" id="test-url-bypass" placeholder="https://sfl.gl/xxx" class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-white font-mono">
+                                <button onclick="testBypassApi()" class="px-5 py-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold transition whitespace-nowrap"><i class="fa-solid fa-link-slash"></i> Bypass</button>
                             </div>
-                            <div id="test-result-box-bypass" class="hidden p-4 bg-stone-950 rounded-xl border border-stone-800 font-mono text-xs text-emerald-400 overflow-x-auto">
-                                <pre id="test-result-json-bypass">// Hasil URL Bypass</pre>
+                            <div id="test-result-box-bypass" class="hidden p-4 bg-emerald-950/80 rounded-xl border border-emerald-900 font-mono text-xs text-emerald-300 overflow-x-auto">
+                                <pre id="test-result-json-bypass">// Hasil Bypass</pre>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- ENDPOINT 4: KALKULATOR -->
-                <div class="rounded-2xl bg-stone-950/60 border border-stone-800 overflow-hidden">
-                    <button onclick="toggleAccordion('calc')" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-stone-900/60 transition text-left">
+                <!-- ENDPOINT 4: CALC -->
+                <div class="rounded-2xl bg-emerald-950/30 border border-emerald-900/50 overflow-hidden">
+                    <button onclick="toggleAccordion('calc')" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-emerald-900/20 transition text-left">
                         <div class="flex items-center gap-3 font-mono text-xs sm:text-sm">
-                            <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">GET</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">GET</span>
                             <span class="text-white font-bold">/api/calc</span>
-                            <span class="text-stone-400 text-xs hidden sm:inline">- Kalkulator Engine (+, -, x, :)</span>
+                            <span class="text-emerald-400/60 text-xs hidden sm:inline">- Kalkulator Engine</span>
                         </div>
-                        <i id="accordion-icon-calc" class="fa-solid fa-chevron-right text-amber-400 text-sm transition-transform duration-300"></i>
+                        <i id="accordion-icon-calc" class="fa-solid fa-chevron-right text-emerald-400 text-sm transition-transform duration-300"></i>
                     </button>
 
-                    <div id="accordion-content-calc" class="hidden p-5 border-t border-stone-800/80 space-y-6 bg-stone-950/40">
+                    <div id="accordion-content-calc" class="hidden p-5 border-t border-emerald-900/40 space-y-6 bg-emerald-950/20">
                         <div class="space-y-2">
-                            <span class="text-xs font-bold uppercase tracking-wider text-stone-400 block">Parameter Request</span>
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400/80 block">Parameter Request</span>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left text-xs font-mono">
-                                    <thead class="bg-stone-900 text-stone-400 border-b border-stone-800">
+                                    <thead class="bg-emerald-950 text-emerald-400 border-b border-emerald-900">
                                         <tr><th class="p-2.5">Parameter</th><th class="p-2.5">Tipe</th><th class="p-2.5">Wajib</th><th class="p-2.5">Keterangan</th></tr>
                                     </thead>
-                                    <tbody class="divide-y divide-stone-800/60 text-stone-300">
-                                        <tr><td class="p-2.5 text-amber-400 font-bold">apikey</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-400">Ya</td><td class="p-2.5">Kunci API milikmu.</td></tr>
-                                        <tr><td class="p-2.5 text-amber-400 font-bold">angka1</td><td class="p-2.5">Number</td><td class="p-2.5 text-emerald-400">Ya</td><td class="p-2.5">Angka pertama.</td></tr>
-                                        <tr><td class="p-2.5 text-amber-400 font-bold">op</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-400">Ya</td><td class="p-2.5">Operator matematika: +, -, x, :</td></tr>
-                                        <tr><td class="p-2.5 text-amber-400 font-bold">angka2</td><td class="p-2.5">Number</td><td class="p-2.5 text-emerald-400">Ya</td><td class="p-2.5">Angka kedua.</td></tr>
+                                    <tbody class="divide-y divide-emerald-900/30 text-emerald-200">
+                                        <tr><td class="p-2.5 text-emerald-400 font-bold">apikey, angka1, op, angka2</td><td class="p-2.5">Var</td><td class="p-2.5 text-emerald-300">Ya</td><td class="p-2.5">Operasi (+, -, x, :).</td></tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
 
-                        <!-- PLAYGROUND KALKULATOR -->
-                        <div class="pt-4 border-t border-stone-800/80 space-y-3">
-                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Uji Coba Langsung Kalkulator</span>
+                        <!-- PLAYGROUND CALC -->
+                        <div class="pt-4 border-t border-emerald-900/40 space-y-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 block">Uji Coba Langsung Kalkulator</span>
                             <div class="flex flex-col sm:flex-row gap-2">
-                                <input type="number" id="test-angka1" placeholder="Angka 1" class="w-full bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-white font-mono">
-                                
-                                <select id="test-op" class="bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-amber-400 font-mono">
-                                    <option value="+">(+) Tambah</option>
-                                    <option value="-">(-) Kurang</option>
-                                    <option value="x">(x) Kali</option>
-                                    <option value=":">(:) Bagi</option>
+                                <input type="number" id="test-angka1" placeholder="Angka 1" class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-white font-mono">
+                                <select id="test-op" class="bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-emerald-300 font-mono">
+                                    <option value="+">+</option><option value="-">-</option><option value="x">x</option><option value=":">:</option>
                                 </select>
-
-                                <input type="number" id="test-angka2" placeholder="Angka 2" class="w-full bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-white font-mono">
-
-                                <button onclick="testCalcApi()" class="px-5 py-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold transition whitespace-nowrap"><i class="fa-solid fa-calculator"></i> Hitung</button>
+                                <input type="number" id="test-angka2" placeholder="Angka 2" class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-white font-mono">
+                                <button onclick="testCalcApi()" class="px-5 py-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold transition whitespace-nowrap"><i class="fa-solid fa-calculator"></i> Hitung</button>
                             </div>
-                            <div id="test-result-box-calc" class="hidden p-4 bg-stone-950 rounded-xl border border-stone-800 font-mono text-xs text-emerald-400 overflow-x-auto">
+                            <div id="test-result-box-calc" class="hidden p-4 bg-emerald-950/80 rounded-xl border border-emerald-900 font-mono text-xs text-emerald-300 overflow-x-auto">
                                 <pre id="test-result-json-calc">// Hasil Kalkulasi</pre>
                             </div>
                         </div>
+                    </div>
+                </div>
 
-                        <!-- SNIPPETS KALKULATOR -->
-                        <div class="pt-4 border-t border-stone-800/80 space-y-4">
-                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Contoh Kode Integrasi</span>
-                            <div class="space-y-1.5">
-                                <div class="flex justify-between items-center text-xs font-mono text-stone-400">
-                                    <span>cURL</span>
-                                    <button onclick="copyCode('code-curl-calc', this)" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-[10px] font-bold transition"><i class="fa-solid fa-copy"></i> Copy</button>
-                                </div>
-                                <div class="p-3 bg-stone-950 rounded-xl border border-stone-800/80 font-mono text-xs text-emerald-400 overflow-x-auto">
-                                    <pre id="code-curl-calc">curl "https://apikeyzenuth.vercel.app/api/calc?apikey=YOUR_API_KEY&angka1=10&op=x&angka2=5"</pre>
-                                </div>
+                <!-- ENDPOINT 5: PARAPHRASE -->
+                <div class="rounded-2xl bg-emerald-950/30 border border-emerald-900/50 overflow-hidden">
+                    <button onclick="toggleAccordion('paraphrase')" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-emerald-900/20 transition text-left">
+                        <div class="flex items-center gap-3 font-mono text-xs sm:text-sm">
+                            <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">GET</span>
+                            <span class="text-white font-bold">/api/paraphrase</span>
+                            <span class="text-emerald-400/60 text-xs hidden sm:inline">- Groq Paraphrase</span>
+                        </div>
+                        <i id="accordion-icon-paraphrase" class="fa-solid fa-chevron-right text-emerald-400 text-sm transition-transform duration-300"></i>
+                    </button>
+
+                    <div id="accordion-content-paraphrase" class="hidden p-5 border-t border-emerald-900/40 space-y-6 bg-emerald-950/20">
+                        <div class="space-y-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400/80 block">Parameter Request</span>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs font-mono">
+                                    <thead class="bg-emerald-950 text-emerald-400 border-b border-emerald-900">
+                                        <tr><th class="p-2.5">Parameter</th><th class="p-2.5">Tipe</th><th class="p-2.5">Wajib</th><th class="p-2.5">Keterangan</th></tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-emerald-900/30 text-emerald-200">
+                                        <tr><td class="p-2.5 text-emerald-400 font-bold">apikey, text</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-300">Ya</td><td class="p-2.5">Kalimat yang ingin diparafrase.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- PLAYGROUND PARAPHRASE -->
+                        <div class="pt-4 border-t border-emerald-900/40 space-y-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 block">Uji Coba Langsung Paraphrase</span>
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <input type="text" id="test-text-para" placeholder="Masukkan kalimat..." class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-white font-mono">
+                                <button onclick="testParaApi()" class="px-5 py-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold transition whitespace-nowrap"><i class="fa-solid fa-pen-nib"></i> Parafrase</button>
+                            </div>
+                            <div id="test-result-box-para" class="hidden p-4 bg-emerald-950/80 rounded-xl border border-emerald-900 font-mono text-xs text-emerald-300 overflow-x-auto">
+                                <pre id="test-result-json-para">// Hasil Paraphrase</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ENDPOINT 6: STORY -->
+                <div class="rounded-2xl bg-emerald-950/30 border border-emerald-900/50 overflow-hidden">
+                    <button onclick="toggleAccordion('story')" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-emerald-900/20 transition text-left">
+                        <div class="flex items-center gap-3 font-mono text-xs sm:text-sm">
+                            <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">GET</span>
+                            <span class="text-white font-bold">/api/story</span>
+                            <span class="text-emerald-400/60 text-xs hidden sm:inline">- Groq Story / Cerpen</span>
+                        </div>
+                        <i id="accordion-icon-story" class="fa-solid fa-chevron-right text-emerald-400 text-sm transition-transform duration-300"></i>
+                    </button>
+
+                    <div id="accordion-content-story" class="hidden p-5 border-t border-emerald-900/40 space-y-6 bg-emerald-950/20">
+                        <div class="space-y-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400/80 block">Parameter Request</span>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs font-mono">
+                                    <thead class="bg-emerald-950 text-emerald-400 border-b border-emerald-900">
+                                        <tr><th class="p-2.5">Parameter</th><th class="p-2.5">Tipe</th><th class="p-2.5">Wajib</th><th class="p-2.5">Keterangan</th></tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-emerald-900/30 text-emerald-200">
+                                        <tr><td class="p-2.5 text-emerald-400 font-bold">apikey, topic</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-300">Ya</td><td class="p-2.5">Tema atau judul cerita.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- PLAYGROUND STORY -->
+                        <div class="pt-4 border-t border-emerald-900/40 space-y-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 block">Uji Coba Langsung Story</span>
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <input type="text" id="test-topic-story" placeholder="Tema cerita..." class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-white font-mono">
+                                <button onclick="testStoryApi()" class="px-5 py-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold transition whitespace-nowrap"><i class="fa-solid fa-book-open"></i> Buat Cerita</button>
+                            </div>
+                            <div id="test-result-box-story" class="hidden p-4 bg-emerald-950/80 rounded-xl border border-emerald-900 font-mono text-xs text-emerald-300 overflow-x-auto">
+                                <pre id="test-result-json-story">// Hasil Cerita</pre>
                             </div>
                         </div>
                     </div>
@@ -348,21 +385,21 @@
             <div class="liquid-glass-glow p-6 sm:p-8 rounded-3xl space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-key text-amber-400"></i> Pengaturan & Status API Key</h2>
-                        <p class="text-stone-400 text-xs sm:text-sm mt-1">Buat API Key baru atau pantau sisa limit harianmu.</p>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-key text-emerald-400"></i> Pengaturan & Status API Key</h2>
+                        <p class="text-emerald-300/70 text-xs sm:text-sm mt-1">Buat API Key baru atau pantau sisa limit harianmu.</p>
                     </div>
-                    <button onclick="generateApiKey()" class="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 text-black font-bold rounded-2xl text-xs transition shadow-lg shadow-amber-500/25"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate API Key Baru</button>
+                    <button onclick="generateApiKey()" class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 text-black font-bold rounded-2xl text-xs transition shadow-lg shadow-emerald-500/20"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate API Key Baru</button>
                 </div>
 
-                <div id="key-info-card" class="p-5 rounded-2xl bg-stone-950/80 border border-amber-500/30 space-y-4">
-                    <div class="flex items-center justify-between border-b border-stone-800 pb-3">
-                        <span class="text-xs font-mono text-stone-400">API Key Aktif:</span>
-                        <span id="display-key" class="text-sm font-mono font-bold text-amber-300">SAW-XXXXXX</span>
+                <div id="key-info-card" class="p-5 rounded-2xl bg-emerald-950/60 border border-emerald-500/30 space-y-4">
+                    <div class="flex items-center justify-between border-b border-emerald-900 pb-3">
+                        <span class="text-xs font-mono text-emerald-400/80">API Key Aktif:</span>
+                        <span id="display-key" class="text-sm font-mono font-bold text-emerald-300">SAW-XXXXXX</span>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center font-mono text-xs">
-                        <div class="p-3 bg-stone-900 rounded-xl border border-stone-800"><span class="text-stone-400 block text-[10px]">TERPAKAI</span><span id="stat-used" class="text-lg font-bold text-amber-400">0</span></div>
-                        <div class="p-3 bg-stone-900 rounded-xl border border-stone-800"><span class="text-stone-400 block text-[10px]">SISA LIMIT</span><span id="stat-remaining" class="text-lg font-bold text-emerald-400">100</span></div>
-                        <div class="p-3 bg-stone-900 rounded-xl border border-stone-800"><span class="text-stone-400 block text-[10px]">TOTAL LIMIT</span><span id="stat-limit" class="text-lg font-bold text-white"><%= config.defaultLimit %></span></div>
+                        <div class="p-3 bg-emerald-950/40 rounded-xl border border-emerald-900/60"><span class="text-emerald-400/70 block text-[10px]">TERPAKAI</span><span id="stat-used" class="text-lg font-bold text-emerald-400">0</span></div>
+                        <div class="p-3 bg-emerald-950/40 rounded-xl border border-emerald-900/60"><span class="text-emerald-400/70 block text-[10px]">SISA LIMIT</span><span id="stat-remaining" class="text-lg font-bold text-emerald-300">100</span></div>
+                        <div class="p-3 bg-emerald-950/40 rounded-xl border border-emerald-900/60"><span class="text-emerald-400/70 block text-[10px]">TOTAL LIMIT</span><span id="stat-limit" class="text-lg font-bold text-white"><%= config.defaultLimit %></span></div>
                     </div>
                 </div>
             </div>
@@ -373,17 +410,17 @@
             <div class="liquid-glass p-6 sm:p-8 rounded-3xl space-y-6">
                 <div class="flex items-center justify-between">
                     <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-bug text-rose-400"></i> Server Error Logs</h2>
-                    <button onclick="fetchErrorLogs()" class="px-4 py-2 bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 rounded-xl text-xs font-bold"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                    <button onclick="fetchErrorLogs()" class="px-4 py-2 bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-900 text-emerald-300 rounded-xl text-xs font-bold"><i class="fa-solid fa-rotate"></i> Refresh</button>
                 </div>
                 <div id="logs-container" class="space-y-3 max-h-[450px] overflow-y-auto pr-1">
-                    <div class="text-center text-stone-500 py-8 text-xs font-mono">Memuat log error...</div>
+                    <div class="text-center text-emerald-400/60 py-8 text-xs font-mono">Memuat log error...</div>
                 </div>
             </div>
         </div>
 
     </div>
 
-    <footer class="text-center text-stone-500 text-xs mt-12 py-4"><%= config.siteName %> &bull; Liquid Glass</footer>
+    <footer class="text-center text-emerald-500/60 text-xs mt-12 py-4"><%= config.siteName %> &bull; Neon Green Glass</footer>
 
     <script>
         let currentApiKey = localStorage.getItem('saw_api_key') || '';
@@ -402,20 +439,12 @@
         function switchTab(tabName) {
             ['docs', 'settings', 'logs'].forEach(tab => {
                 document.getElementById(`tab-${tab}`).classList.add('hidden');
-                document.getElementById(`nav-${tab}`).className = "w-full text-left px-4 py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-3 text-stone-400 hover:bg-stone-800/60 hover:text-white";
+                document.getElementById(`nav-${tab}`).className = "w-full text-left px-4 py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-3 text-emerald-400/70 hover:bg-emerald-950/40 hover:text-white";
             });
             document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-            document.getElementById(`nav-${tabName}`).className = "w-full text-left px-4 py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-3 bg-amber-500/20 text-amber-300 border border-amber-500/30";
+            document.getElementById(`nav-${tabName}`).className = "w-full text-left px-4 py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-3 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
             if (tabName === 'logs') fetchErrorLogs();
             toggleSidebar();
-        }
-
-        function copyCode(id, btn) {
-            navigator.clipboard.writeText(document.getElementById(id).innerText).then(() => {
-                let orig = btn.innerHTML;
-                btn.innerHTML = '<i class="fa-solid fa-check text-emerald-400"></i> Copied!';
-                setTimeout(() => btn.innerHTML = orig, 2000);
-            });
         }
 
         async function generateApiKey() {
@@ -482,14 +511,34 @@
             checkKeyStatus(currentApiKey);
         }
 
+        async function testParaApi() {
+            if (!currentApiKey) return alert('Buat API Key dulu di menu Pengaturan!');
+            const text = document.getElementById('test-text-para').value;
+            const res = await fetch(`/api/paraphrase?apikey=${currentApiKey}&text=${encodeURIComponent(text)}`);
+            const data = await res.json();
+            document.getElementById('test-result-box-para').classList.remove('hidden');
+            document.getElementById('test-result-json-para').innerText = JSON.stringify(data, null, 2);
+            checkKeyStatus(currentApiKey);
+        }
+
+        async function testStoryApi() {
+            if (!currentApiKey) return alert('Buat API Key dulu di menu Pengaturan!');
+            const topic = document.getElementById('test-topic-story').value;
+            const res = await fetch(`/api/story?apikey=${currentApiKey}&topic=${encodeURIComponent(topic)}`);
+            const data = await res.json();
+            document.getElementById('test-result-box-story').classList.remove('hidden');
+            document.getElementById('test-result-json-story').innerText = JSON.stringify(data, null, 2);
+            checkKeyStatus(currentApiKey);
+        }
+
         async function fetchErrorLogs() {
             const res = await fetch('/api/logs');
             const data = await res.json();
             const container = document.getElementById('logs-container');
             if (data.success && data.logs.length > 0) {
-                container.innerHTML = data.logs.map(l => `<div class="p-3 bg-stone-950 rounded-xl border border-rose-500/20 text-xs font-mono"><span class="text-rose-400">[${l.statusCode}] ${l.endpoint}</span> - ${l.message}</div>`).join('');
+                container.innerHTML = data.logs.map(l => `<div class="p-3 bg-emerald-950/60 rounded-xl border border-rose-500/30 text-xs font-mono"><span class="text-rose-400">[${l.statusCode}] ${l.endpoint}</span> - ${l.message}</div>`).join('');
             } else {
-                container.innerHTML = `<div class="text-center text-stone-500 py-6 text-xs font-mono">✓ Belum ada error tercatat.</div>`;
+                container.innerHTML = `<div class="text-center text-emerald-400/60 py-6 text-xs font-mono">✓ Belum ada error tercatat.</div>`;
             }
         }
     </script>
