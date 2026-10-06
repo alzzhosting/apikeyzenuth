@@ -21,7 +21,8 @@ const SITE_CONFIG = {
     maxLogsToKeep: 50
 };
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AQ.Ab8RN6L3iwvouEq-l5shid2D11Y6XAPKzBn_mOT7QrEubSYJog';
+// Groq API Key dan konfigurasi model baru
+const GROQ_API_KEY = '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';
 const ZENNQ_API_KEY = 'zq_eu1maz2hkr3uv319ffp2jl0shohwj2lt';
 
 const errorLogs = [];
@@ -179,7 +180,7 @@ app.get('/api/check-key', (req, res) => {
     });
 });
 
-// Endpoint 1: AI Prompt
+// Endpoint 1: AI Prompt menggunakan Groq API
 app.get('/api/ai', checkRateLimit, async (req, res) => {
     const prompt = req.query.prompt;
     if (!prompt || prompt.trim() === '') {
@@ -188,24 +189,36 @@ app.get('/api/ai', checkRateLimit, async (req, res) => {
     }
 
     try {
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${GEMINI_API_KEY}`;
-        const response = await fetch(geminiUrl, {
+        const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${GROQ_API_KEY}`
+            },
+            body: JSON.stringify({
+                messages: [{ role: 'user', content: prompt }],
+                model: 'openai/gpt-oss-120b',
+                temperature: 1,
+                max_completion_tokens: 2048,
+                top_p: 1,
+                stream: false, // Diubah ke false agar server Express bisa langsung merespons JSON utuh ke client
+                reasoning_effort: 'medium',
+                stop: null
+            })
         });
-        const data = await response.json();
 
-        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
+        const data = await groqResponse.json();
+
+        if (data.choices && data.choices[0] && data.choices[0].message) {
             return res.json({
                 success: true,
                 author: SITE_CONFIG.siteName,
                 prompt: prompt,
-                result: data.candidates[0].content.parts[0].text,
+                result: data.choices[0].message.content.trim(),
                 usage: { usedToday: req.keyInfo.count, remaining: req.keyInfo.limit - req.keyInfo.count, limit: req.keyInfo.limit }
             });
         } else {
-            const errMsg = data.error ? data.error.message : 'Respons AI tidak valid.';
+            const errMsg = data.error ? data.error.message : 'Respons Groq AI tidak valid.';
             recordErrorLog(req.originalUrl, errMsg, 500);
             return res.status(500).json({ success: false, message: `Gagal memproses AI: ${errMsg}` });
         }
@@ -283,16 +296,13 @@ app.get('/api/bypass', checkRateLimit, async (req, res) => {
     }
 });
 
-// Endpoint 4: API Kalkulator (/api/calc)
+// Endpoint 4: Kalkulator
 app.get('/api/calc', checkRateLimit, (req, res) => {
     let { angka1, op, angka2 } = req.query;
 
     if (angka1 === undefined || op === undefined || angka2 === undefined) {
         recordErrorLog(req.originalUrl, 'Parameter kalkulator tidak lengkap', 400);
-        return res.status(400).json({ 
-            success: false, 
-            message: 'Parameter angka1, op (+, -, x, :), dan angka2 wajib diisi!' 
-        });
+        return res.status(400).json({ success: false, message: 'Parameter angka1, op (+, -, x, :), dan angka2 wajib diisi!' });
     }
 
     const num1 = parseFloat(angka1);
@@ -304,21 +314,11 @@ app.get('/api/calc', checkRateLimit, (req, res) => {
     }
 
     let hasil = 0;
-
     switch (op) {
-        case '+':
-            hasil = num1 + num2;
-            break;
-        case '-':
-            hasil = num1 - num2;
-            break;
-        case 'x':
-        case 'X':
-        case '*':
-            hasil = num1 * num2;
-            break;
-        case ':':
-        case '/':
+        case '+': hasil = num1 + num2; break;
+        case '-': hasil = num1 - num2; break;
+        case 'x': case 'X': case '*': hasil = num1 * num2; break;
+        case ':': case '/':
             if (num2 === 0) {
                 recordErrorLog(req.originalUrl, 'Pembagian dengan nol', 400);
                 return res.status(400).json({ success: false, message: 'Kesalahan: Tidak dapat membagi angka dengan nol (0)!' });
@@ -327,10 +327,7 @@ app.get('/api/calc', checkRateLimit, (req, res) => {
             break;
         default:
             recordErrorLog(req.originalUrl, `Operator tidak dikenal: ${op}`, 400);
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Operator tidak valid! Gunakan "+" (tambah), "-" (kurang), "x" (kali), atau ":" (bagi).' 
-            });
+            return res.status(400).json({ success: false, message: 'Operator tidak valid! Gunakan "+", "-", "x", atau ":".' });
     }
 
     return res.json({
@@ -338,12 +335,98 @@ app.get('/api/calc', checkRateLimit, (req, res) => {
         author: SITE_CONFIG.siteName,
         operasi: `${num1} ${op} ${num2}`,
         result: hasil,
-        usage: {
-            usedToday: req.keyInfo.count,
-            remaining: req.keyInfo.limit - req.keyInfo.count,
-            limit: req.keyInfo.limit
-        }
+        usage: { usedToday: req.keyInfo.count, remaining: req.keyInfo.limit - req.keyInfo.count, limit: req.keyInfo.limit }
     });
+});
+
+// Endpoint 5: Paraphrase
+app.get('/api/paraphrase', checkRateLimit, async (req, res) => {
+    const text = req.query.text;
+    if (!text || text.trim() === '') {
+        recordErrorLog(req.originalUrl, 'Parameter text kosong pada paraphrase', 400);
+        return res.status(400).json({ success: false, message: 'Parameter text tidak boleh kosong!' });
+    }
+
+    const prompt = `Parafrase atau ubah kalimat berikut agar memiliki susunan kata yang berbeda namun tetap mempertahankan makna aslinya. Berikan hasil parafrasenya saja:\n\n"${text}"`;
+
+    try {
+        const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
+            body: JSON.stringify({
+                messages: [{ role: 'user', content: prompt }],
+                model: 'openai/gpt-oss-120b',
+                temperature: 1,
+                max_completion_tokens: 2048,
+                top_p: 1,
+                stream: false,
+                reasoning_effort: 'medium'
+            })
+        });
+        const data = await groqResponse.json();
+
+        if (data.choices && data.choices[0] && data.choices[0].message) {
+            return res.json({
+                success: true,
+                author: SITE_CONFIG.siteName,
+                originalText: text,
+                result: data.choices[0].message.content.trim(),
+                usage: { usedToday: req.keyInfo.count, remaining: req.keyInfo.limit - req.keyInfo.count, limit: req.keyInfo.limit }
+            });
+        } else {
+            const errMsg = data.error ? data.error.message : 'Gagal memproses parafrase.';
+            recordErrorLog(req.originalUrl, errMsg, 500);
+            return res.status(500).json({ success: false, message: `Gagal paraphrase: ${errMsg}` });
+        }
+    } catch (err) {
+        recordErrorLog(req.originalUrl, err.message, 500);
+        return res.status(500).json({ success: false, message: `Gagal paraphrase: ${err.message}` });
+    }
+});
+
+// Endpoint 6: Story Generator / Cerpen
+app.get('/api/story', checkRateLimit, async (req, res) => {
+    const topic = req.query.topic;
+    if (!topic || topic.trim() === '') {
+        recordErrorLog(req.originalUrl, 'Parameter topic kosong pada story', 400);
+        return res.status(400).json({ success: false, message: 'Parameter topic tidak boleh kosong!' });
+    }
+
+    const prompt = `Buatkan sebuah cerita pendek (cerpen) yang menarik, kreatif, dan bermakna berdasarkan tema atau judul berikut:\n\n"${topic}"`;
+
+    try {
+        const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROQ_API_KEY}` },
+            body: JSON.stringify({
+                messages: [{ role: 'user', content: prompt }],
+                model: 'openai/gpt-oss-120b',
+                temperature: 1,
+                max_completion_tokens: 2048,
+                top_p: 1,
+                stream: false,
+                reasoning_effort: 'medium'
+            })
+        });
+        const data = await groqResponse.json();
+
+        if (data.choices && data.choices[0] && data.choices[0].message) {
+            return res.json({
+                success: true,
+                author: SITE_CONFIG.siteName,
+                topic: topic,
+                result: data.choices[0].message.content.trim(),
+                usage: { usedToday: req.keyInfo.count, remaining: req.keyInfo.limit - req.keyInfo.count, limit: req.keyInfo.limit }
+            });
+        } else {
+            const errMsg = data.error ? data.error.message : 'Gagal membuat cerita.';
+            recordErrorLog(req.originalUrl, errMsg, 500);
+            return res.status(500).json({ success: false, message: `Gagal membuat cerita: ${errMsg}` });
+        }
+    } catch (err) {
+        recordErrorLog(req.originalUrl, err.message, 500);
+        return res.status(500).json({ success: false, message: `Gagal membuat cerita: ${err.message}` });
+    }
 });
 
 app.get('/api/logs', (req, res) => {
