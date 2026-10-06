@@ -123,10 +123,86 @@
                     <h2 class="text-xl font-bold text-white flex items-center gap-2">
                         <i class="fa-solid fa-cubes text-emerald-400"></i> Daftar Endpoint & Contoh Integrasi
                     </h2>
-                    <p class="text-emerald-300/70 text-xs sm:text-sm mt-1">Klik pada nama endpoint untuk melihat parameter, uji coba langsung, serta contoh kode cURL dan JavaScript.</p>
+                    <p class="text-emerald-300/70 text-xs sm:text-sm mt-1">Gunakan endpoint Character Story (CS) untuk membuat cerita roleplay SA-MP secara instan.</p>
                 </div>
 
-                <!-- ENDPOINT 1: AI PROMPT -->
+                <!-- ENDPOINT BARU: CHARACTER STORY (CS) -->
+                <div class="rounded-2xl bg-emerald-950/30 border border-emerald-900/50 overflow-hidden">
+                    <button onclick="toggleAccordion('cs')" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-emerald-900/20 transition text-left">
+                        <div class="flex items-center gap-3 font-mono text-xs sm:text-sm">
+                            <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">GET</span>
+                            <span class="text-white font-bold">/api/character-story</span>
+                            <span class="text-emerald-400/60 text-xs hidden sm:inline">- SA-MP Character Story Creator</span>
+                        </div>
+                        <i id="accordion-icon-cs" class="fa-solid fa-chevron-right text-emerald-400 text-sm transition-transform duration-300"></i>
+                    </button>
+
+                    <div id="accordion-content-cs" class="hidden p-5 border-t border-emerald-900/40 space-y-6 bg-emerald-950/20">
+                        <div class="space-y-3 font-mono text-xs">
+                            <span class="text-emerald-400 font-bold uppercase tracking-wider block">Form Detail Karakter SA-MP</span>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-stone-400 mb-1">Nama Karakter (IC) *</label>
+                                    <input type="text" id="cs-nama" placeholder="Contoh: Jack_Ainsley" class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-stone-400 mb-1">Tanggal / Tahun Lahir *</label>
+                                    <input type="text" id="cs-tgl" placeholder="Contoh: 12 April 1998" class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-stone-400 mb-1">Asal / Kewarganegaraan *</label>
+                                    <input type="text" id="cs-asal" placeholder="Contoh: United States of America" class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-white">
+                                </div>
+                                <div>
+                                    <label class="block text-stone-400 mb-1">Latar Belakang Kehidupan</label>
+                                    <select id="cs-latar" class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-emerald-300">
+                                        <option value="Perantau / Pencari Kerja">Perantau / Pencari Kerja</option>
+                                        <option value="Mantan Anggota Geng / Street Life">Mantan Anggota Geng / Street Life</option>
+                                        <option value="Keluarga Kaya / Bangsawan">Keluarga Kaya / Bangsawan</option>
+                                        <option value="Anak Jalanan / Yatim Piatu">Anak Jalanan / Yatim Piatu</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-stone-400 mb-1">Vibe Kepribadian</label>
+                                    <select id="cs-vibe" class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-emerald-300">
+                                        <option value="Tenang, Misterius, dan Perhitungan">Tenang, Misterius, dan Perhitungan</option>
+                                        <option value="Keras Kepala, Suka Onar, dan Berani">Keras Kepala, Suka Onar, dan Berani</option>
+                                        <option value="Ramah, Pekerja Keras, dan Loyal">Ramah, Pekerja Keras, dan Loyal</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-stone-400 mb-1">Jumlah Paragraf</label>
+                                    <select id="cs-paragraf" class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-emerald-300">
+                                        <option value="3 Paragraf (~300 Kata)">3 Paragraf (~300 Kata)</option>
+                                        <option value="4 Paragraf (~450 Kata)" selected>4 Paragraf (~450 Kata)</option>
+                                        <option value="5 Paragraf (~600 Kata)">5 Paragraf (~600 Kata)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-stone-400 mb-1">Catatan Tambahan (Opsi)</label>
+                                <textarea id="cs-catatan" placeholder="Contoh: Datang ke Los Santos mencari kakaknya yang hilang..." rows="2" class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-white"></textarea>
+                            </div>
+                            <button onclick="testCsApi()" class="w-full py-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 rounded-xl font-bold transition"><i class="fa-solid fa-scroll"></i> Buat Karakter (Submit CS)</button>
+                            <div id="test-result-box-cs" class="hidden p-3 bg-emerald-950/80 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="test-result-json-cs"></pre></div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs text-emerald-400"><span>cURL Example</span><button onclick="copyCode('code-cs-curl', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
+                            <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-cs-curl">curl "https://apikeyzenuth.vercel.app/api/character-story?apikey=YOUR_KEY&nama=Jack_Ainsley&tanggalLahir=12%20April%201998&asal=USA&paragraf=4%20Paragraf"</pre></div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs text-emerald-400"><span>JavaScript (Fetch) Example</span><button onclick="copyCode('code-cs-js', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
+                            <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-cs-js">const res = await fetch('https://apikeyzenuth.vercel.app/api/character-story?apikey=YOUR_KEY&nama=Jack_Ainsley&tanggalLahir=12%20April%201998&asal=USA');
+const data = await res.json();
+console.log(data.result);</pre></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ENDPOINT LAINNYA (AI, TRANSLATE, BYPASS, CALC, PARAPHRASE, STORY) -->
+                <!-- AI PROMPT -->
                 <div class="rounded-2xl bg-emerald-950/30 border border-emerald-900/50 overflow-hidden">
                     <button onclick="toggleAccordion('ai')" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-emerald-900/20 transition text-left">
                         <div class="flex items-center gap-3 font-mono text-xs sm:text-sm">
@@ -136,21 +212,18 @@
                         </div>
                         <i id="accordion-icon-ai" class="fa-solid fa-chevron-right text-emerald-400 text-sm transition-transform duration-300"></i>
                     </button>
-
                     <div id="accordion-content-ai" class="hidden p-5 border-t border-emerald-900/40 space-y-6 bg-emerald-950/20">
-                        <div class="space-y-3">
-                            <div class="flex gap-2">
-                                <input type="text" id="test-prompt-ai" placeholder="Tanya sesuatu..." class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-white font-mono">
-                                <button onclick="testAiApi()" class="px-5 py-3 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold">Kirim</button>
-                            </div>
-                            <div id="test-result-box-ai" class="hidden p-3 bg-emerald-950/80 rounded-xl font-mono text-xs text-emerald-300"><pre id="test-result-json-ai"></pre></div>
+                        <div class="flex gap-2">
+                            <input type="text" id="test-prompt-ai" placeholder="Tanya sesuatu..." class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-white font-mono">
+                            <button onclick="testAiApi()" class="px-5 py-3 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold">Kirim</button>
                         </div>
+                        <div id="test-result-box-ai" class="hidden p-3 bg-emerald-950/80 rounded-xl font-mono text-xs text-emerald-300"><pre id="test-result-json-ai"></pre></div>
                         <div class="space-y-2">
                             <div class="flex justify-between text-xs text-emerald-400"><span>cURL Example</span><button onclick="copyCode('code-ai-curl', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
                             <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-ai-curl">curl "https://apikeyzenuth.vercel.app/api/ai?apikey=YOUR_KEY&prompt=halo"</pre></div>
                         </div>
                         <div class="space-y-2">
-                            <div class="flex justify-between text-xs text-emerald-400"><span>JavaScript (Fetch) Example</span><button onclick="copyCode('code-ai-js', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
+                            <div class="flex justify-between text-xs text-emerald-400"><span>JavaScript Example</span><button onclick="copyCode('code-ai-js', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
                             <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-ai-js">const res = await fetch('https://apikeyzenuth.vercel.app/api/ai?apikey=YOUR_KEY&prompt=halo');
 const data = await res.json();
 console.log(data.result);</pre></div>
@@ -158,7 +231,7 @@ console.log(data.result);</pre></div>
                     </div>
                 </div>
 
-                <!-- ENDPOINT 2: TRANSLATE -->
+                <!-- TRANSLATE -->
                 <div class="rounded-2xl bg-emerald-950/30 border border-emerald-900/50 overflow-hidden">
                     <button onclick="toggleAccordion('translate')" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-emerald-900/20 transition text-left">
                         <div class="flex items-center gap-3 font-mono text-xs sm:text-sm">
@@ -169,20 +242,17 @@ console.log(data.result);</pre></div>
                         <i id="accordion-icon-translate" class="fa-solid fa-chevron-right text-emerald-400 text-sm transition-transform duration-300"></i>
                     </button>
                     <div id="accordion-content-translate" class="hidden p-5 border-t border-emerald-900/40 space-y-6 bg-emerald-950/20">
-                        <div class="space-y-3">
-                            <div class="flex gap-2">
-                                <input type="text" id="test-text-trans" placeholder="Teks..." class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-white font-mono">
-                                <select id="test-to-trans" class="bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-emerald-300 font-mono"><option value="en">en</option><option value="id">id</option></select>
-                                <button onclick="testTranslateApi()" class="px-5 py-3 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold">Terjemahkan</button>
-                            </div>
-                            <div id="test-result-box-trans" class="hidden p-3 bg-emerald-950/80 rounded-xl font-mono text-xs text-emerald-300"><pre id="test-result-json-trans"></pre></div>
+                        <div class="flex gap-2">
+                            <input type="text" id="test-text-trans" placeholder="Teks..." class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-white font-mono">
+                            <button onclick="testTranslateApi()" class="px-5 py-3 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold">Translate</button>
                         </div>
+                        <div id="test-result-box-trans" class="hidden p-3 bg-emerald-950/80 rounded-xl font-mono text-xs text-emerald-300"><pre id="test-result-json-trans"></pre></div>
                         <div class="space-y-2">
                             <div class="flex justify-between text-xs text-emerald-400"><span>cURL Example</span><button onclick="copyCode('code-trans-curl', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
                             <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-trans-curl">curl "https://apikeyzenuth.vercel.app/api/translate?apikey=YOUR_KEY&text=halo&to=en"</pre></div>
                         </div>
                         <div class="space-y-2">
-                            <div class="flex justify-between text-xs text-emerald-400"><span>JavaScript (Fetch) Example</span><button onclick="copyCode('code-trans-js', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
+                            <div class="flex justify-between text-xs text-emerald-400"><span>JavaScript Example</span><button onclick="copyCode('code-trans-js', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
                             <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-trans-js">const res = await fetch('https://apikeyzenuth.vercel.app/api/translate?apikey=YOUR_KEY&text=halo&to=en');
 const data = await res.json();
 console.log(data.result);</pre></div>
@@ -190,7 +260,7 @@ console.log(data.result);</pre></div>
                     </div>
                 </div>
 
-                <!-- ENDPOINT 3: BYPASS -->
+                <!-- BYPASS -->
                 <div class="rounded-2xl bg-emerald-950/30 border border-emerald-900/50 overflow-hidden">
                     <button onclick="toggleAccordion('bypass')" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-emerald-900/20 transition text-left">
                         <div class="flex items-center gap-3 font-mono text-xs sm:text-sm">
@@ -201,19 +271,17 @@ console.log(data.result);</pre></div>
                         <i id="accordion-icon-bypass" class="fa-solid fa-chevron-right text-emerald-400 text-sm transition-transform duration-300"></i>
                     </button>
                     <div id="accordion-content-bypass" class="hidden p-5 border-t border-emerald-900/40 space-y-6 bg-emerald-950/20">
-                        <div class="space-y-3">
-                            <div class="flex gap-2">
-                                <input type="text" id="test-url-bypass" placeholder="https://sfl.gl/xxx" class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-white font-mono">
-                                <button onclick="testBypassApi()" class="px-5 py-3 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold">Bypass</button>
-                            </div>
-                            <div id="test-result-box-bypass" class="hidden p-3 bg-emerald-950/80 rounded-xl font-mono text-xs text-emerald-300"><pre id="test-result-json-bypass"></pre></div>
+                        <div class="flex gap-2">
+                            <input type="text" id="test-url-bypass" placeholder="URL..." class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-white font-mono">
+                            <button onclick="testBypassApi()" class="px-5 py-3 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold">Bypass</button>
                         </div>
+                        <div id="test-result-box-bypass" class="hidden p-3 bg-emerald-950/80 rounded-xl font-mono text-xs text-emerald-300"><pre id="test-result-json-bypass"></pre></div>
                         <div class="space-y-2">
                             <div class="flex justify-between text-xs text-emerald-400"><span>cURL Example</span><button onclick="copyCode('code-bypass-curl', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
                             <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-bypass-curl">curl "https://apikeyzenuth.vercel.app/api/bypass?apikey=YOUR_KEY&url=https://sfl.gl/xxx"</pre></div>
                         </div>
                         <div class="space-y-2">
-                            <div class="flex justify-between text-xs text-emerald-400"><span>JavaScript (Fetch) Example</span><button onclick="copyCode('code-bypass-js', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
+                            <div class="flex justify-between text-xs text-emerald-400"><span>JavaScript Example</span><button onclick="copyCode('code-bypass-js', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
                             <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-bypass-js">const res = await fetch('https://apikeyzenuth.vercel.app/api/bypass?apikey=YOUR_KEY&url=https://sfl.gl/xxx');
 const data = await res.json();
 console.log(data.result);</pre></div>
@@ -221,7 +289,7 @@ console.log(data.result);</pre></div>
                     </div>
                 </div>
 
-                <!-- ENDPOINT 4: CALC -->
+                <!-- CALC -->
                 <div class="rounded-2xl bg-emerald-950/30 border border-emerald-900/50 overflow-hidden">
                     <button onclick="toggleAccordion('calc')" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-emerald-900/20 transition text-left">
                         <div class="flex items-center gap-3 font-mono text-xs sm:text-sm">
@@ -232,21 +300,19 @@ console.log(data.result);</pre></div>
                         <i id="accordion-icon-calc" class="fa-solid fa-chevron-right text-emerald-400 text-sm transition-transform duration-300"></i>
                     </button>
                     <div id="accordion-content-calc" class="hidden p-5 border-t border-emerald-900/40 space-y-6 bg-emerald-950/20">
-                        <div class="space-y-3">
-                            <div class="flex gap-2">
-                                <input type="number" id="test-angka1" placeholder="Angka 1" class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-white font-mono">
-                                <select id="test-op" class="bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-emerald-300 font-mono"><option value="+">+</option><option value="-">-</option><option value="x">x</option><option value=":">:</option></select>
-                                <input type="number" id="test-angka2" placeholder="Angka 2" class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-white font-mono">
-                                <button onclick="testCalcApi()" class="px-5 py-3 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold">Hitung</button>
-                            </div>
-                            <div id="test-result-box-calc" class="hidden p-3 bg-emerald-950/80 rounded-xl font-mono text-xs text-emerald-300"><pre id="test-result-json-calc"></pre></div>
+                        <div class="flex gap-2">
+                            <input type="number" id="test-angka1" placeholder="A1" class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-white font-mono">
+                            <select id="test-op" class="bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-emerald-300 font-mono"><option value="+">+</option><option value="x">x</option></select>
+                            <input type="number" id="test-angka2" placeholder="A2" class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-white font-mono">
+                            <button onclick="testCalcApi()" class="px-5 py-3 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold">Hitung</button>
                         </div>
+                        <div id="test-result-box-calc" class="hidden p-3 bg-emerald-950/80 rounded-xl font-mono text-xs text-emerald-300"><pre id="test-result-json-calc"></pre></div>
                         <div class="space-y-2">
                             <div class="flex justify-between text-xs text-emerald-400"><span>cURL Example</span><button onclick="copyCode('code-calc-curl', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
                             <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-calc-curl">curl "https://apikeyzenuth.vercel.app/api/calc?apikey=YOUR_KEY&angka1=10&op=x&angka2=5"</pre></div>
                         </div>
                         <div class="space-y-2">
-                            <div class="flex justify-between text-xs text-emerald-400"><span>JavaScript (Fetch) Example</span><button onclick="copyCode('code-calc-js', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
+                            <div class="flex justify-between text-xs text-emerald-400"><span>JavaScript Example</span><button onclick="copyCode('code-calc-js', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
                             <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-calc-js">const res = await fetch('https://apikeyzenuth.vercel.app/api/calc?apikey=YOUR_KEY&angka1=10&op=x&angka2=5');
 const data = await res.json();
 console.log(data.result);</pre></div>
@@ -254,7 +320,7 @@ console.log(data.result);</pre></div>
                     </div>
                 </div>
 
-                <!-- ENDPOINT 5: PARAPHRASE -->
+                <!-- PARAPHRASE -->
                 <div class="rounded-2xl bg-emerald-950/30 border border-emerald-900/50 overflow-hidden">
                     <button onclick="toggleAccordion('paraphrase')" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-emerald-900/20 transition text-left">
                         <div class="flex items-center gap-3 font-mono text-xs sm:text-sm">
@@ -265,19 +331,17 @@ console.log(data.result);</pre></div>
                         <i id="accordion-icon-paraphrase" class="fa-solid fa-chevron-right text-emerald-400 text-sm transition-transform duration-300"></i>
                     </button>
                     <div id="accordion-content-paraphrase" class="hidden p-5 border-t border-emerald-900/40 space-y-6 bg-emerald-950/20">
-                        <div class="space-y-3">
-                            <div class="flex gap-2">
-                                <input type="text" id="test-text-para" placeholder="Teks..." class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-white font-mono">
-                                <button onclick="testParaApi()" class="px-5 py-3 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold">Parafrase</button>
-                            </div>
-                            <div id="test-result-box-para" class="hidden p-3 bg-emerald-950/80 rounded-xl font-mono text-xs text-emerald-300"><pre id="test-result-json-para"></pre></div>
+                        <div class="flex gap-2">
+                            <input type="text" id="test-text-para" placeholder="Teks..." class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-white font-mono">
+                            <button onclick="testParaApi()" class="px-5 py-3 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold">Parafrase</button>
                         </div>
+                        <div id="test-result-box-para" class="hidden p-3 bg-emerald-950/80 rounded-xl font-mono text-xs text-emerald-300"><pre id="test-result-json-para"></pre></div>
                         <div class="space-y-2">
                             <div class="flex justify-between text-xs text-emerald-400"><span>cURL Example</span><button onclick="copyCode('code-para-curl', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
                             <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-para-curl">curl "https://apikeyzenuth.vercel.app/api/paraphrase?apikey=YOUR_KEY&text=halo"</pre></div>
                         </div>
                         <div class="space-y-2">
-                            <div class="flex justify-between text-xs text-emerald-400"><span>JavaScript (Fetch) Example</span><button onclick="copyCode('code-para-js', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
+                            <div class="flex justify-between text-xs text-emerald-400"><span>JavaScript Example</span><button onclick="copyCode('code-para-js', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
                             <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-para-js">const res = await fetch('https://apikeyzenuth.vercel.app/api/paraphrase?apikey=YOUR_KEY&text=halo');
 const data = await res.json();
 console.log(data.result);</pre></div>
@@ -285,7 +349,7 @@ console.log(data.result);</pre></div>
                     </div>
                 </div>
 
-                <!-- ENDPOINT 6: STORY -->
+                <!-- STORY -->
                 <div class="rounded-2xl bg-emerald-950/30 border border-emerald-900/50 overflow-hidden">
                     <button onclick="toggleAccordion('story')" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-emerald-900/20 transition text-left">
                         <div class="flex items-center gap-3 font-mono text-xs sm:text-sm">
@@ -296,19 +360,17 @@ console.log(data.result);</pre></div>
                         <i id="accordion-icon-story" class="fa-solid fa-chevron-right text-emerald-400 text-sm transition-transform duration-300"></i>
                     </button>
                     <div id="accordion-content-story" class="hidden p-5 border-t border-emerald-900/40 space-y-6 bg-emerald-950/20">
-                        <div class="space-y-3">
-                            <div class="flex gap-2">
-                                <input type="text" id="test-topic-story" placeholder="Tema cerita..." class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-white font-mono">
-                                <button onclick="testStoryApi()" class="px-5 py-3 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold">Buat</button>
-                            </div>
-                            <div id="test-result-box-story" class="hidden p-3 bg-emerald-950/80 rounded-xl font-mono text-xs text-emerald-300"><pre id="test-result-json-story"></pre></div>
+                        <div class="flex gap-2">
+                            <input type="text" id="test-topic-story" placeholder="Tema..." class="w-full bg-emerald-950/60 border border-emerald-900/60 p-3 rounded-xl text-xs text-white font-mono">
+                            <button onclick="testStoryApi()" class="px-5 py-3 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-bold">Buat</button>
                         </div>
+                        <div id="test-result-box-story" class="hidden p-3 bg-emerald-950/80 rounded-xl font-mono text-xs text-emerald-300"><pre id="test-result-json-story"></pre></div>
                         <div class="space-y-2">
                             <div class="flex justify-between text-xs text-emerald-400"><span>cURL Example</span><button onclick="copyCode('code-story-curl', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
                             <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-story-curl">curl "https://apikeyzenuth.vercel.app/api/story?apikey=YOUR_KEY&topic=petualangan"</pre></div>
                         </div>
                         <div class="space-y-2">
-                            <div class="flex justify-between text-xs text-emerald-400"><span>JavaScript (Fetch) Example</span><button onclick="copyCode('code-story-js', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
+                            <div class="flex justify-between text-xs text-emerald-400"><span>JavaScript Example</span><button onclick="copyCode('code-story-js', this)" class="px-2 py-1 bg-emerald-900 text-white rounded text-[10px]">Copy</button></div>
                             <div class="p-3 bg-emerald-950 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto"><pre id="code-story-js">const res = await fetch('https://apikeyzenuth.vercel.app/api/story?apikey=YOUR_KEY&topic=petualangan');
 const data = await res.json();
 console.log(data.result);</pre></div>
@@ -319,35 +381,29 @@ console.log(data.result);</pre></div>
             </div>
         </div>
 
-        <!-- TAB 2: PENGATURAN & LIMIT KEY -->
+        <!-- TAB 2: PENGATURAN -->
         <div id="tab-settings" class="hidden space-y-6">
             <div class="liquid-glass-glow p-6 sm:p-8 rounded-3xl space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-key text-emerald-400"></i> Pengaturan & Status API Key
-                        </h2>
-                        <p class="text-emerald-300/70 text-xs sm:text-sm mt-1">Buat API Key baru atau pantau sisa limit harianmu secara realtime.</p>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-key text-emerald-400"></i> Pengaturan & Status API Key</h2>
+                        <p class="text-emerald-300/70 text-xs sm:text-sm mt-1">Buat API Key baru atau pantau sisa limit harianmu.</p>
                     </div>
-                    <button onclick="generateApiKey()" class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 text-black font-extrabold rounded-2xl text-xs transition shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate API Key Baru
-                    </button>
+                    <button onclick="generateApiKey()" class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 text-black font-extrabold rounded-2xl text-xs transition shadow-lg shadow-emerald-500/20"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate API Key Baru</button>
                 </div>
 
                 <div class="p-6 rounded-2xl bg-emerald-950/60 border border-emerald-500/30 space-y-6">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-emerald-900/60 pb-4 gap-2">
-                        <span class="text-xs font-mono text-emerald-400/80 uppercase tracking-wider">API Key Aktif Kamu:</span>
+                        <span class="text-xs font-mono text-emerald-400/80 uppercase tracking-wider">API Key Aktif:</span>
                         <div class="flex items-center gap-2 w-full sm:w-auto">
                             <span id="display-key" class="text-sm font-mono font-bold text-emerald-300 bg-emerald-950 px-3 py-1.5 rounded-xl border border-emerald-800/60 select-all">SAW-XXXXXX</span>
-                            <button onclick="copyActiveKey()" class="px-3 py-1.5 bg-emerald-900/60 hover:bg-emerald-900 text-emerald-200 rounded-xl text-xs font-mono font-bold transition flex items-center gap-1">
-                                <i class="fa-solid fa-copy"></i> Salin
-                            </button>
+                            <button onclick="copyActiveKey()" class="px-3 py-1.5 bg-emerald-900/60 hover:bg-emerald-900 text-emerald-200 rounded-xl text-xs font-mono font-bold transition"><i class="fa-solid fa-copy"></i> Salin</button>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center font-mono">
                         <div class="p-4 bg-emerald-950/40 rounded-2xl border border-emerald-900/60 space-y-1">
-                            <span class="text-emerald-400/70 text-[10px] uppercase tracking-wider block">Terpakai Hari Ini</span>
+                            <span class="text-emerald-400/70 text-[10px] uppercase tracking-wider block">Terpakai</span>
                             <span id="stat-used" class="text-2xl font-extrabold text-emerald-400">0</span>
                         </div>
                         <div class="p-4 bg-emerald-950/40 rounded-2xl border border-emerald-900/60 space-y-1">
@@ -355,7 +411,7 @@ console.log(data.result);</pre></div>
                             <span id="stat-remaining" class="text-2xl font-extrabold text-emerald-300">100</span>
                         </div>
                         <div class="p-4 bg-emerald-950/40 rounded-2xl border border-emerald-900/60 space-y-1">
-                            <span class="text-emerald-400/70 text-[10px] uppercase tracking-wider block">Total Kuota Harian</span>
+                            <span class="text-emerald-400/70 text-[10px] uppercase tracking-wider block">Total Limit</span>
                             <span id="stat-limit" class="text-2xl font-extrabold text-white"><%= config.defaultLimit %></span>
                         </div>
                     </div>
@@ -363,23 +419,17 @@ console.log(data.result);</pre></div>
             </div>
         </div>
 
-        <!-- TAB 3: ERROR LOGS (DENGAN TOMBOL REFRESH INTERAKTIF) -->
+        <!-- TAB 3: ERROR LOGS -->
         <div id="tab-logs" class="hidden space-y-6">
             <div class="liquid-glass p-6 sm:p-8 rounded-3xl space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-bug text-rose-400"></i> Server Error Logs
-                        </h2>
-                        <p class="text-emerald-300/70 text-xs sm:text-sm mt-1">Pantau riwayat error atau kendala sistem server secara langsung.</p>
-                    </div>
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-bug text-rose-400"></i> Server Error Logs</h2>
                     <button onclick="fetchErrorLogs()" id="refresh-btn" class="px-5 py-2.5 bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-900 text-emerald-300 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-md">
                         <i id="refresh-icon" class="fa-solid fa-rotate"></i> Refresh Logs
                     </button>
                 </div>
-
                 <div id="logs-container" class="space-y-3 max-h-[500px] overflow-y-auto pr-1">
-                    <div class="text-center text-emerald-400/60 py-12 text-xs font-mono">Memuat log error server...</div>
+                    <div class="text-center text-emerald-400/60 py-12 text-xs font-mono">Memuat log error...</div>
                 </div>
             </div>
         </div>
@@ -422,42 +472,53 @@ console.log(data.result);</pre></div>
         }
 
         function copyActiveKey() {
-            const keyText = document.getElementById('display-key').innerText;
-            navigator.clipboard.writeText(keyText).then(() => {
-                alert('✓ API Key berhasil disalin ke clipboard!');
-            });
+            navigator.clipboard.writeText(document.getElementById('display-key').innerText).then(() => alert('✓ API Key disalin!'));
         }
 
         async function generateApiKey() {
-            try {
-                const res = await fetch('/api/generate-key', { method: 'POST' });
-                const data = await res.json();
-                if (data.success) {
-                    currentApiKey = data.key;
-                    localStorage.setItem('saw_api_key', data.key);
-                    checkKeyStatus(data.key);
-                    alert('✓ API Key baru berhasil dibuat!');
-                }
-            } catch (err) {
-                alert('Gagal membuat API Key.');
+            const res = await fetch('/api/generate-key', { method: 'POST' });
+            const data = await res.json();
+            if (data.success) {
+                currentApiKey = data.key;
+                localStorage.setItem('saw_api_key', data.key);
+                checkKeyStatus(data.key);
+                alert('✓ API Key berhasil dibuat!');
             }
         }
 
         async function checkKeyStatus(key) {
-            try {
-                const res = await fetch(`/api/check-key?apikey=${key}`);
-                const data = await res.json();
-                if (data.success) {
-                    document.getElementById('display-key').innerText = data.key;
-                    document.getElementById('stat-used').innerText = data.used;
-                    document.getElementById('stat-remaining').innerText = data.remaining;
-                    document.getElementById('stat-limit').innerText = data.limit;
-                }
-            } catch (err) {}
+            const res = await fetch(`/api/check-key?apikey=${key}`);
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('display-key').innerText = data.key;
+                document.getElementById('stat-used').innerText = data.used;
+                document.getElementById('stat-remaining').innerText = data.remaining;
+            }
+        }
+
+        async function testCsApi() {
+            if (!currentApiKey) return alert('Buat API Key dulu di menu Pengaturan!');
+            const nama = document.getElementById('cs-nama').value;
+            const tanggalLahir = document.getElementById('cs-tgl').value;
+            const asal = document.getElementById('cs-asal').value;
+            const latarBelakang = document.getElementById('cs-latar').value;
+            const vibe = document.getElementById('cs-vibe').value;
+            const paragraf = document.getElementById('cs-paragraf').value;
+            const catatan = document.getElementById('cs-catatan').value;
+
+            if (!nama || !tanggalLahir || !asal) return alert('Nama, Tanggal Lahir, dan Asal wajib diisi!');
+
+            const url = `/api/character-story?apikey=${currentApiKey}&nama=${encodeURIComponent(nama)}&tanggalLahir=${encodeURIComponent(tanggalLahir)}&asal=${encodeURIComponent(asal)}&latarBelakang=${encodeURIComponent(latarBelakang)}&vibe=${encodeURIComponent(vibe)}&paragraf=${encodeURIComponent(paragraf)}&catatan=${encodeURIComponent(catatan)}`;
+            
+            const res = await fetch(url);
+            const data = await res.json();
+            document.getElementById('test-result-box-cs').classList.remove('hidden');
+            document.getElementById('test-result-json-cs').innerText = JSON.stringify(data, null, 2);
+            checkKeyStatus(currentApiKey);
         }
 
         async function testAiApi() {
-            if (!currentApiKey) return alert('Buat API Key dulu di menu Pengaturan!');
+            if (!currentApiKey) return alert('Buat API Key dulu!');
             const prompt = document.getElementById('test-prompt-ai').value;
             const res = await fetch(`/api/ai?apikey=${currentApiKey}&prompt=${encodeURIComponent(prompt)}`);
             const data = await res.json();
@@ -467,10 +528,9 @@ console.log(data.result);</pre></div>
         }
 
         async function testTranslateApi() {
-            if (!currentApiKey) return alert('Buat API Key dulu di menu Pengaturan!');
+            if (!currentApiKey) return alert('Buat API Key dulu!');
             const text = document.getElementById('test-text-trans').value;
-            const to = document.getElementById('test-to-trans').value;
-            const res = await fetch(`/api/translate?apikey=${currentApiKey}&text=${encodeURIComponent(text)}&to=${to}`);
+            const res = await fetch(`/api/translate?apikey=${currentApiKey}&text=${encodeURIComponent(text)}&to=en`);
             const data = await res.json();
             document.getElementById('test-result-box-trans').classList.remove('hidden');
             document.getElementById('test-result-json-trans').innerText = JSON.stringify(data, null, 2);
@@ -478,7 +538,7 @@ console.log(data.result);</pre></div>
         }
 
         async function testBypassApi() {
-            if (!currentApiKey) return alert('Buat API Key dulu di menu Pengaturan!');
+            if (!currentApiKey) return alert('Buat API Key dulu!');
             const url = document.getElementById('test-url-bypass').value;
             const res = await fetch(`/api/bypass?apikey=${currentApiKey}&url=${encodeURIComponent(url)}`);
             const data = await res.json();
@@ -488,7 +548,7 @@ console.log(data.result);</pre></div>
         }
 
         async function testCalcApi() {
-            if (!currentApiKey) return alert('Buat API Key dulu di menu Pengaturan!');
+            if (!currentApiKey) return alert('Buat API Key dulu!');
             const a1 = document.getElementById('test-angka1').value;
             const op = document.getElementById('test-op').value;
             const a2 = document.getElementById('test-angka2').value;
@@ -500,7 +560,7 @@ console.log(data.result);</pre></div>
         }
 
         async function testParaApi() {
-            if (!currentApiKey) return alert('Buat API Key dulu di menu Pengaturan!');
+            if (!currentApiKey) return alert('Buat API Key dulu!');
             const text = document.getElementById('test-text-para').value;
             const res = await fetch(`/api/paraphrase?apikey=${currentApiKey}&text=${encodeURIComponent(text)}`);
             const data = await res.json();
@@ -510,7 +570,7 @@ console.log(data.result);</pre></div>
         }
 
         async function testStoryApi() {
-            if (!currentApiKey) return alert('Buat API Key dulu di menu Pengaturan!');
+            if (!currentApiKey) return alert('Buat API Key dulu!');
             const topic = document.getElementById('test-topic-story').value;
             const res = await fetch(`/api/story?apikey=${currentApiKey}&topic=${encodeURIComponent(topic)}`);
             const data = await res.json();
@@ -523,11 +583,9 @@ console.log(data.result);</pre></div>
             const container = document.getElementById('logs-container');
             const icon = document.getElementById('refresh-icon');
             icon.classList.add('fa-spin');
-            
             try {
                 const res = await fetch('/api/logs');
                 const data = await res.json();
-
                 if (data.success && data.logs.length > 0) {
                     container.innerHTML = data.logs.map(l => `
                         <div class="p-4 rounded-2xl bg-emerald-950/60 border border-rose-500/30 space-y-1 font-mono text-xs">
@@ -539,10 +597,10 @@ console.log(data.result);</pre></div>
                         </div>
                     `).join('');
                 } else {
-                    container.innerHTML = `<div class="text-center text-emerald-400/60 py-12 text-xs font-mono bg-emerald-950/30 rounded-2xl border border-emerald-900/50">✓ Belum ada error tercatat. Server berjalan sangat lancar!</div>`;
+                    container.innerHTML = `<div class="text-center text-emerald-400/60 py-12 text-xs font-mono bg-emerald-950/30 rounded-2xl border border-emerald-900/50">✓ Belum ada error tercatat. Server berjalan lancar!</div>`;
                 }
             } catch (err) {
-                container.innerHTML = `<div class="text-center text-rose-400 py-12 text-xs font-mono">Gagal memuat daftar log error server.</div>`;
+                container.innerHTML = `<div class="text-center text-rose-400 py-12 text-xs font-mono">Gagal memuat log.</div>`;
             } finally {
                 setTimeout(() => icon.classList.remove('fa-spin'), 500);
             }
