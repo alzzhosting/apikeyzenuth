@@ -60,7 +60,7 @@
     <!-- OVERLAY SIDEBAR -->
     <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
 
-    <!-- SIDEBAR NAVIGASI HAMBURGER -->
+    <!-- SIDEBAR NAVIGASI -->
     <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-stone-950/95 border-r border-amber-500/20 z-50 transform -translate-x-full p-6 flex flex-col justify-between shadow-2xl liquid-glass">
         <div>
             <div class="flex items-center justify-between pb-6 border-b border-stone-800">
@@ -123,7 +123,7 @@
                     <h2 class="text-xl font-bold text-white flex items-center gap-2">
                         <i class="fa-solid fa-cubes text-amber-400"></i> Daftar Endpoint & Contoh Integrasi
                     </h2>
-                    <p class="text-stone-400 text-xs sm:text-sm mt-1">Klik pada nama endpoint untuk melihat parameter, uji coba langsung, dan contoh salinan kode bot.</p>
+                    <p class="text-stone-400 text-xs sm:text-sm mt-1">Klik pada nama endpoint untuk melihat parameter, uji coba langsung, dan contoh salinan kode.</p>
                 </div>
 
                 <!-- ENDPOINT 1: AI PROMPT -->
@@ -132,7 +132,7 @@
                         <div class="flex items-center gap-3 font-mono text-xs sm:text-sm">
                             <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">GET</span>
                             <span class="text-white font-bold">/api/ai</span>
-                            <span class="text-stone-400 text-xs hidden sm:inline">- <%= config.siteName %> AI Engine</span>
+                            <span class="text-stone-400 text-xs hidden sm:inline">- AI Engine</span>
                         </div>
                         <i id="accordion-icon-ai" class="fa-solid fa-chevron-right text-amber-400 text-sm transition-transform duration-300"></i>
                     </button>
@@ -146,24 +146,14 @@
                                         <tr><th class="p-2.5">Parameter</th><th class="p-2.5">Tipe</th><th class="p-2.5">Wajib</th><th class="p-2.5">Keterangan</th></tr>
                                     </thead>
                                     <tbody class="divide-y divide-stone-800/60 text-stone-300">
-                                        <tr>
-                                            <td class="p-2.5 text-amber-400 font-bold">apikey</td>
-                                            <td class="p-2.5">String</td>
-                                            <td class="p-2.5 text-emerald-400">Ya</td>
-                                            <td class="p-2.5">Kunci API milikmu.</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="p-2.5 text-amber-400 font-bold">prompt</td>
-                                            <td class="p-2.5">String</td>
-                                            <td class="p-2.5 text-emerald-400">Ya</td>
-                                            <td class="p-2.5">Pertanyaan atau instruksi untuk AI.</td>
-                                        </tr>
+                                        <tr><td class="p-2.5 text-amber-400 font-bold">apikey</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-400">Ya</td><td class="p-2.5">Kunci API milikmu.</td></tr>
+                                        <tr><td class="p-2.5 text-amber-400 font-bold">prompt</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-400">Ya</td><td class="p-2.5">Pertanyaan untuk AI.</td></tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
 
-                        <!-- PLAYGROUND TEST -->
+                        <!-- PLAYGROUND AI -->
                         <div class="pt-4 border-t border-stone-800/80 space-y-3">
                             <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Uji Coba Langsung AI</span>
                             <div class="flex flex-col sm:flex-row gap-2">
@@ -172,61 +162,24 @@
                                     <i class="fa-solid fa-paper-plane"></i> Kirim
                                 </button>
                             </div>
-
                             <div id="test-result-box-ai" class="hidden p-4 bg-stone-950 rounded-xl border border-stone-800 font-mono text-xs text-emerald-400 overflow-x-auto">
                                 <pre id="test-result-json-ai">// Jawaban AI muncul di sini</pre>
                             </div>
                         </div>
 
-                        <!-- INTEGRATION CODE SNIPPETS -->
+                        <!-- SNIPPETS AI -->
                         <div class="pt-4 border-t border-stone-800/80 space-y-4">
-                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Contoh Kode Integrasi Bot</span>
-                            
+                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Contoh Kode Integrasi</span>
                             <div class="space-y-1.5">
                                 <div class="flex justify-between items-center text-xs font-mono text-stone-400">
                                     <span>cURL</span>
-                                    <button onclick="copyCode('code-curl-ai', this)" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
-                                        <i class="fa-solid fa-copy"></i> Copy
-                                    </button>
+                                    <button onclick="copyCode('code-curl-ai', this)" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-[10px] font-bold transition"><i class="fa-solid fa-copy"></i> Copy</button>
                                 </div>
                                 <div class="p-3 bg-stone-950 rounded-xl border border-stone-800/80 font-mono text-xs text-emerald-400 overflow-x-auto">
                                     <pre id="code-curl-ai">curl "https://apikeyzenuth.vercel.app/api/ai?apikey=YOUR_API_KEY&prompt=halo"</pre>
                                 </div>
                             </div>
-
-                            <div class="space-y-1.5">
-                                <div class="flex justify-between items-center text-xs font-mono text-stone-400">
-                                    <span>JavaScript (Fetch)</span>
-                                    <button onclick="copyCode('code-js-ai', this)" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
-                                        <i class="fa-solid fa-copy"></i> Copy
-                                    </button>
-                                </div>
-                                <div class="p-3 bg-stone-950 rounded-xl border border-stone-800/80 font-mono text-xs text-emerald-400 overflow-x-auto">
-                                    <pre id="code-js-ai">const res = await fetch('https://apikeyzenuth.vercel.app/api/ai?apikey=YOUR_API_KEY&prompt=halo');
-const data = await res.json();
-console.log(data.result);</pre>
-                                </div>
-                            </div>
-
-                            <div class="space-y-1.5">
-                                <div class="flex justify-between items-center text-xs font-mono text-stone-400">
-                                    <span>Python (requests)</span>
-                                    <button onclick="copyCode('code-py-ai', this)" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
-                                        <i class="fa-solid fa-copy"></i> Copy
-                                    </button>
-                                </div>
-                                <div class="p-3 bg-stone-950 rounded-xl border border-stone-800/80 font-mono text-xs text-emerald-400 overflow-x-auto">
-                                    <pre id="code-py-ai">import requests
-
-response = requests.get('https://apikeyzenuth.vercel.app/api/ai', params={
-    'apikey': 'YOUR_API_KEY',
-    'prompt': 'halo'
-})
-print(response.json()['result'])</pre>
-                                </div>
-                            </div>
                         </div>
-
                     </div>
                 </div>
 
@@ -236,7 +189,7 @@ print(response.json()['result'])</pre>
                         <div class="flex items-center gap-3 font-mono text-xs sm:text-sm">
                             <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">GET</span>
                             <span class="text-white font-bold">/api/translate</span>
-                            <span class="text-stone-400 text-xs hidden sm:inline">- Fast Google Translator</span>
+                            <span class="text-stone-400 text-xs hidden sm:inline">- Fast Translator</span>
                         </div>
                         <i id="accordion-icon-translate" class="fa-solid fa-chevron-right text-amber-400 text-sm transition-transform duration-300"></i>
                     </button>
@@ -250,104 +203,32 @@ print(response.json()['result'])</pre>
                                         <tr><th class="p-2.5">Parameter</th><th class="p-2.5">Tipe</th><th class="p-2.5">Wajib</th><th class="p-2.5">Keterangan</th></tr>
                                     </thead>
                                     <tbody class="divide-y divide-stone-800/60 text-stone-300">
-                                        <tr>
-                                            <td class="p-2.5 text-amber-400 font-bold">apikey</td>
-                                            <td class="p-2.5">String</td>
-                                            <td class="p-2.5 text-emerald-400">Ya</td>
-                                            <td class="p-2.5">Kunci API milikmu.</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="p-2.5 text-amber-400 font-bold">text</td>
-                                            <td class="p-2.5">String</td>
-                                            <td class="p-2.5 text-emerald-400">Ya</td>
-                                            <td class="p-2.5">Kalimat yang ingin diterjemahkan.</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="p-2.5 text-amber-400 font-bold">to</td>
-                                            <td class="p-2.5">String</td>
-                                            <td class="p-2.5 text-amber-400">Opsional</td>
-                                            <td class="p-2.5">Kode bahasa tujuan (contoh: en, ja, id, ko). Default: en.</td>
-                                        </tr>
+                                        <tr><td class="p-2.5 text-amber-400 font-bold">apikey</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-400">Ya</td><td class="p-2.5">Kunci API milikmu.</td></tr>
+                                        <tr><td class="p-2.5 text-amber-400 font-bold">text</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-400">Ya</td><td class="p-2.5">Teks yang diterjemahkan.</td></tr>
+                                        <tr><td class="p-2.5 text-amber-400 font-bold">to</td><td class="p-2.5">String</td><td class="p-2.5 text-amber-400">Opsional</td><td class="p-2.5">Kode bahasa tujuan (default: en).</td></tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
 
-                        <!-- PLAYGROUND TRANSLATOR -->
+                        <!-- PLAYGROUND TRANSLATE -->
                         <div class="pt-4 border-t border-stone-800/80 space-y-3">
                             <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Uji Coba Langsung Translator</span>
                             <div class="flex flex-col sm:flex-row gap-2">
-                                <input type="text" id="test-text-trans" placeholder="Teks terjemahan (contoh: Selamat pagi)" class="w-full bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500 font-mono">
-                                
-                                <select id="test-to-trans" class="bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-amber-400 focus:outline-none focus:border-amber-500 font-mono">
+                                <input type="text" id="test-text-trans" placeholder="Teks..." class="w-full bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500 font-mono">
+                                <select id="test-to-trans" class="bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-amber-400 font-mono">
                                     <option value="en">Inggris (en)</option>
                                     <option value="ja">Jepang (ja)</option>
                                     <option value="id">Indonesia (id)</option>
                                     <option value="ko">Korea (ko)</option>
                                     <option value="ar">Arab (ar)</option>
-                                    <option value="jw">Jawa (jw)</option>
                                 </select>
-
-                                <button onclick="testTranslateApi()" class="px-5 py-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 whitespace-nowrap">
-                                    <i class="fa-solid fa-language"></i> Terjemahkan
-                                </button>
+                                <button onclick="testTranslateApi()" class="px-5 py-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold transition whitespace-nowrap"><i class="fa-solid fa-language"></i> Terjemahkan</button>
                             </div>
-
                             <div id="test-result-box-trans" class="hidden p-4 bg-stone-950 rounded-xl border border-stone-800 font-mono text-xs text-emerald-400 overflow-x-auto">
-                                <pre id="test-result-json-trans">// Hasil Terjemahan muncul di sini</pre>
+                                <pre id="test-result-json-trans">// Hasil Terjemahan</pre>
                             </div>
                         </div>
-
-                        <!-- CODE SNIPPETS TRANSLATOR -->
-                        <div class="pt-4 border-t border-stone-800/80 space-y-4">
-                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Contoh Kode Integrasi Bot</span>
-                            
-                            <div class="space-y-1.5">
-                                <div class="flex justify-between items-center text-xs font-mono text-stone-400">
-                                    <span>cURL</span>
-                                    <button onclick="copyCode('code-curl-trans', this)" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
-                                        <i class="fa-solid fa-copy"></i> Copy
-                                    </button>
-                                </div>
-                                <div class="p-3 bg-stone-950 rounded-xl border border-stone-800/80 font-mono text-xs text-emerald-400 overflow-x-auto">
-                                    <pre id="code-curl-trans">curl "https://apikeyzenuth.vercel.app/api/translate?apikey=YOUR_API_KEY&text=Selamat%20pagi&to=en"</pre>
-                                </div>
-                            </div>
-
-                            <div class="space-y-1.5">
-                                <div class="flex justify-between items-center text-xs font-mono text-stone-400">
-                                    <span>JavaScript (Fetch)</span>
-                                    <button onclick="copyCode('code-js-trans', this)" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
-                                        <i class="fa-solid fa-copy"></i> Copy
-                                    </button>
-                                </div>
-                                <div class="p-3 bg-stone-950 rounded-xl border border-stone-800/80 font-mono text-xs text-emerald-400 overflow-x-auto">
-                                    <pre id="code-js-trans">const res = await fetch('https://apikeyzenuth.vercel.app/api/translate?apikey=YOUR_API_KEY&text=Selamat%20pagi&to=en');
-const data = await res.json();
-console.log(data.result);</pre>
-                                </div>
-                            </div>
-
-                            <div class="space-y-1.5">
-                                <div class="flex justify-between items-center text-xs font-mono text-stone-400">
-                                    <span>Python (requests)</span>
-                                    <button onclick="copyCode('code-py-trans', this)" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
-                                        <i class="fa-solid fa-copy"></i> Copy
-                                    </button>
-                                </div>
-                                <div class="p-3 bg-stone-950 rounded-xl border border-stone-800/80 font-mono text-xs text-emerald-400 overflow-x-auto">
-                                    <pre id="code-py-trans">import requests
-
-response = requests.get('https://apikeyzenuth.vercel.app/api/translate', params={
-    'apikey': 'YOUR_API_KEY',
-    'text': 'Selamat pagi',
-    'to': 'en'
-})
-print(response.json()['result'])</pre>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
 
@@ -357,7 +238,7 @@ print(response.json()['result'])</pre>
                         <div class="flex items-center gap-3 font-mono text-xs sm:text-sm">
                             <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">GET</span>
                             <span class="text-white font-bold">/api/bypass</span>
-                            <span class="text-stone-400 text-xs hidden sm:inline">- Shortlink Bypass Engine</span>
+                            <span class="text-stone-400 text-xs hidden sm:inline">- Bypass Engine</span>
                         </div>
                         <i id="accordion-icon-bypass" class="fa-solid fa-chevron-right text-amber-400 text-sm transition-transform duration-300"></i>
                     </button>
@@ -371,18 +252,8 @@ print(response.json()['result'])</pre>
                                         <tr><th class="p-2.5">Parameter</th><th class="p-2.5">Tipe</th><th class="p-2.5">Wajib</th><th class="p-2.5">Keterangan</th></tr>
                                     </thead>
                                     <tbody class="divide-y divide-stone-800/60 text-stone-300">
-                                        <tr>
-                                            <td class="p-2.5 text-amber-400 font-bold">apikey</td>
-                                            <td class="p-2.5">String</td>
-                                            <td class="p-2.5 text-emerald-400">Ya</td>
-                                            <td class="p-2.5">Kunci API milikmu.</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="p-2.5 text-amber-400 font-bold">url</td>
-                                            <td class="p-2.5">String</td>
-                                            <td class="p-2.5 text-emerald-400">Ya</td>
-                                            <td class="p-2.5">Tautan shortlink target yang ingin di-bypass (contoh: https://sfl.gl/xxx).</td>
-                                        </tr>
+                                        <tr><td class="p-2.5 text-amber-400 font-bold">apikey</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-400">Ya</td><td class="p-2.5">Kunci API milikmu.</td></tr>
+                                        <tr><td class="p-2.5 text-amber-400 font-bold">url</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-400">Ya</td><td class="p-2.5">Tautan shortlink target.</td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -392,85 +263,95 @@ print(response.json()['result'])</pre>
                         <div class="pt-4 border-t border-stone-800/80 space-y-3">
                             <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Uji Coba Langsung Bypass</span>
                             <div class="flex flex-col sm:flex-row gap-2">
-                                <input type="text" id="test-url-bypass" placeholder="URL Shortlink (contoh: https://sfl.gl/xxx)" class="w-full bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500 font-mono">
-                                <button onclick="testBypassApi()" class="px-5 py-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 whitespace-nowrap">
-                                    <i class="fa-solid fa-link-slash"></i> Bypass URL
-                                </button>
+                                <input type="text" id="test-url-bypass" placeholder="https://sfl.gl/xxx" class="w-full bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-white focus:outline-none focus:border-amber-500 font-mono">
+                                <button onclick="testBypassApi()" class="px-5 py-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold transition whitespace-nowrap"><i class="fa-solid fa-link-slash"></i> Bypass</button>
                             </div>
-
                             <div id="test-result-box-bypass" class="hidden p-4 bg-stone-950 rounded-xl border border-stone-800 font-mono text-xs text-emerald-400 overflow-x-auto">
-                                <pre id="test-result-json-bypass">// Hasil URL Bypass muncul di sini</pre>
+                                <pre id="test-result-json-bypass">// Hasil URL Bypass</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ENDPOINT 4: KALKULATOR -->
+                <div class="rounded-2xl bg-stone-950/60 border border-stone-800 overflow-hidden">
+                    <button onclick="toggleAccordion('calc')" class="w-full p-4 sm:p-5 flex items-center justify-between hover:bg-stone-900/60 transition text-left">
+                        <div class="flex items-center gap-3 font-mono text-xs sm:text-sm">
+                            <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">GET</span>
+                            <span class="text-white font-bold">/api/calc</span>
+                            <span class="text-stone-400 text-xs hidden sm:inline">- Kalkulator Engine (+, -, x, :)</span>
+                        </div>
+                        <i id="accordion-icon-calc" class="fa-solid fa-chevron-right text-amber-400 text-sm transition-transform duration-300"></i>
+                    </button>
+
+                    <div id="accordion-content-calc" class="hidden p-5 border-t border-stone-800/80 space-y-6 bg-stone-950/40">
+                        <div class="space-y-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-stone-400 block">Parameter Request</span>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs font-mono">
+                                    <thead class="bg-stone-900 text-stone-400 border-b border-stone-800">
+                                        <tr><th class="p-2.5">Parameter</th><th class="p-2.5">Tipe</th><th class="p-2.5">Wajib</th><th class="p-2.5">Keterangan</th></tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-stone-800/60 text-stone-300">
+                                        <tr><td class="p-2.5 text-amber-400 font-bold">apikey</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-400">Ya</td><td class="p-2.5">Kunci API milikmu.</td></tr>
+                                        <tr><td class="p-2.5 text-amber-400 font-bold">angka1</td><td class="p-2.5">Number</td><td class="p-2.5 text-emerald-400">Ya</td><td class="p-2.5">Angka pertama.</td></tr>
+                                        <tr><td class="p-2.5 text-amber-400 font-bold">op</td><td class="p-2.5">String</td><td class="p-2.5 text-emerald-400">Ya</td><td class="p-2.5">Operator matematika: +, -, x, :</td></tr>
+                                        <tr><td class="p-2.5 text-amber-400 font-bold">angka2</td><td class="p-2.5">Number</td><td class="p-2.5 text-emerald-400">Ya</td><td class="p-2.5">Angka kedua.</td></tr>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
 
-                        <!-- CODE SNIPPETS BYPASS -->
+                        <!-- PLAYGROUND KALKULATOR -->
+                        <div class="pt-4 border-t border-stone-800/80 space-y-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Uji Coba Langsung Kalkulator</span>
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <input type="number" id="test-angka1" placeholder="Angka 1" class="w-full bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-white font-mono">
+                                
+                                <select id="test-op" class="bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-amber-400 font-mono">
+                                    <option value="+">(+) Tambah</option>
+                                    <option value="-">(-) Kurang</option>
+                                    <option value="x">(x) Kali</option>
+                                    <option value=":">(:) Bagi</option>
+                                </select>
+
+                                <input type="number" id="test-angka2" placeholder="Angka 2" class="w-full bg-stone-900 border border-stone-800 p-3 rounded-xl text-xs text-white font-mono">
+
+                                <button onclick="testCalcApi()" class="px-5 py-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-xl text-xs font-bold transition whitespace-nowrap"><i class="fa-solid fa-calculator"></i> Hitung</button>
+                            </div>
+                            <div id="test-result-box-calc" class="hidden p-4 bg-stone-950 rounded-xl border border-stone-800 font-mono text-xs text-emerald-400 overflow-x-auto">
+                                <pre id="test-result-json-calc">// Hasil Kalkulasi</pre>
+                            </div>
+                        </div>
+
+                        <!-- SNIPPETS KALKULATOR -->
                         <div class="pt-4 border-t border-stone-800/80 space-y-4">
-                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Contoh Kode Integrasi Bot</span>
-                            
+                            <span class="text-xs font-bold uppercase tracking-wider text-amber-400 block">Contoh Kode Integrasi</span>
                             <div class="space-y-1.5">
                                 <div class="flex justify-between items-center text-xs font-mono text-stone-400">
                                     <span>cURL</span>
-                                    <button onclick="copyCode('code-curl-bypass', this)" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
-                                        <i class="fa-solid fa-copy"></i> Copy
-                                    </button>
+                                    <button onclick="copyCode('code-curl-calc', this)" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-[10px] font-bold transition"><i class="fa-solid fa-copy"></i> Copy</button>
                                 </div>
                                 <div class="p-3 bg-stone-950 rounded-xl border border-stone-800/80 font-mono text-xs text-emerald-400 overflow-x-auto">
-                                    <pre id="code-curl-bypass">curl "https://apikeyzenuth.vercel.app/api/bypass?apikey=YOUR_API_KEY&url=https://sfl.gl/xxx"</pre>
-                                </div>
-                            </div>
-
-                            <div class="space-y-1.5">
-                                <div class="flex justify-between items-center text-xs font-mono text-stone-400">
-                                    <span>JavaScript (Fetch)</span>
-                                    <button onclick="copyCode('code-js-bypass', this)" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
-                                        <i class="fa-solid fa-copy"></i> Copy
-                                    </button>
-                                </div>
-                                <div class="p-3 bg-stone-950 rounded-xl border border-stone-800/80 font-mono text-xs text-emerald-400 overflow-x-auto">
-                                    <pre id="code-js-bypass">const res = await fetch('https://apikeyzenuth.vercel.app/api/bypass?apikey=YOUR_API_KEY&url=https://sfl.gl/xxx');
-const data = await res.json();
-console.log(data.result);</pre>
-                                </div>
-                            </div>
-
-                            <div class="space-y-1.5">
-                                <div class="flex justify-between items-center text-xs font-mono text-stone-400">
-                                    <span>Python (requests)</span>
-                                    <button onclick="copyCode('code-py-bypass', this)" class="px-2.5 py-1 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-[10px] font-bold transition flex items-center gap-1">
-                                        <i class="fa-solid fa-copy"></i> Copy
-                                    </button>
-                                </div>
-                                <div class="p-3 bg-stone-950 rounded-xl border border-stone-800/80 font-mono text-xs text-emerald-400 overflow-x-auto">
-                                    <pre id="code-py-bypass">import requests
-
-response = requests.get('https://apikeyzenuth.vercel.app/api/bypass', params={
-    'apikey': 'YOUR_API_KEY',
-    'url': 'https://sfl.gl/xxx'
-})
-print(response.json()['result'])</pre>
+                                    <pre id="code-curl-calc">curl "https://apikeyzenuth.vercel.app/api/calc?apikey=YOUR_API_KEY&angka1=10&op=x&angka2=5"</pre>
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
 
             </div>
         </div>
 
-        <!-- TAB 2: PENGATURAN & LIMIT -->
+        <!-- TAB 2: SETTINGS -->
         <div id="tab-settings" class="hidden space-y-6">
             <div class="liquid-glass-glow p-6 sm:p-8 rounded-3xl space-y-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-key text-amber-400"></i> Pengaturan & Status API Key
-                        </h2>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-key text-amber-400"></i> Pengaturan & Status API Key</h2>
                         <p class="text-stone-400 text-xs sm:text-sm mt-1">Buat API Key baru atau pantau sisa limit harianmu.</p>
                     </div>
-                    <button onclick="generateApiKey()" class="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 text-black font-bold rounded-2xl text-xs sm:text-sm transition shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate API Key Baru
-                    </button>
+                    <button onclick="generateApiKey()" class="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 text-black font-bold rounded-2xl text-xs transition shadow-lg shadow-amber-500/25"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate API Key Baru</button>
                 </div>
 
                 <div id="key-info-card" class="p-5 rounded-2xl bg-stone-950/80 border border-amber-500/30 space-y-4">
@@ -478,50 +359,22 @@ print(response.json()['result'])</pre>
                         <span class="text-xs font-mono text-stone-400">API Key Aktif:</span>
                         <span id="display-key" class="text-sm font-mono font-bold text-amber-300">SAW-XXXXXX</span>
                     </div>
-
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center font-mono text-xs">
-                        <div class="p-3 bg-stone-900 rounded-xl border border-stone-800">
-                            <span class="text-stone-400 block text-[10px]">TERPAKAI HARI INI</span>
-                            <span id="stat-used" class="text-lg font-bold text-amber-400">0</span>
-                        </div>
-                        <div class="p-3 bg-stone-900 rounded-xl border border-stone-800">
-                            <span class="text-stone-400 block text-[10px]">SISA LIMIT</span>
-                            <span id="stat-remaining" class="text-lg font-bold text-emerald-400">100</span>
-                        </div>
-                        <div class="p-3 bg-stone-900 rounded-xl border border-stone-800">
-                            <span class="text-stone-400 block text-[10px]">TOTAL LIMIT HARIAN</span>
-                            <span id="stat-limit" class="text-lg font-bold text-white"><%= config.defaultLimit %></span>
-                        </div>
-                    </div>
-
-                    <div class="space-y-1.5">
-                        <div class="flex justify-between text-[10px] font-mono text-stone-400">
-                            <span>Penggunaan Limit</span>
-                            <span id="stat-percent">0%</span>
-                        </div>
-                        <div class="w-full bg-stone-900 h-2.5 rounded-full overflow-hidden border border-stone-800">
-                            <div id="limit-progress-bar" class="bg-gradient-to-r from-amber-500 to-orange-500 h-full w-0 transition-all duration-500"></div>
-                        </div>
+                        <div class="p-3 bg-stone-900 rounded-xl border border-stone-800"><span class="text-stone-400 block text-[10px]">TERPAKAI</span><span id="stat-used" class="text-lg font-bold text-amber-400">0</span></div>
+                        <div class="p-3 bg-stone-900 rounded-xl border border-stone-800"><span class="text-stone-400 block text-[10px]">SISA LIMIT</span><span id="stat-remaining" class="text-lg font-bold text-emerald-400">100</span></div>
+                        <div class="p-3 bg-stone-900 rounded-xl border border-stone-800"><span class="text-stone-400 block text-[10px]">TOTAL LIMIT</span><span id="stat-limit" class="text-lg font-bold text-white"><%= config.defaultLimit %></span></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- TAB 3: ERROR LOGS -->
+        <!-- TAB 3: LOGS -->
         <div id="tab-logs" class="hidden space-y-6">
             <div class="liquid-glass p-6 sm:p-8 rounded-3xl space-y-6">
                 <div class="flex items-center justify-between">
-                    <div>
-                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-bug text-rose-400"></i> Server Error Logs
-                        </h2>
-                        <p class="text-stone-400 text-xs sm:text-sm mt-1">Daftar riwayat error yang terjadi pada server.</p>
-                    </div>
-                    <button onclick="fetchErrorLogs()" class="px-4 py-2 bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-rotate mr-1"></i> Refresh Logs
-                    </button>
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-bug text-rose-400"></i> Server Error Logs</h2>
+                    <button onclick="fetchErrorLogs()" class="px-4 py-2 bg-stone-900 hover:bg-stone-800 border border-stone-700 text-stone-300 rounded-xl text-xs font-bold"><i class="fa-solid fa-rotate"></i> Refresh</button>
                 </div>
-
                 <div id="logs-container" class="space-y-3 max-h-[450px] overflow-y-auto pr-1">
                     <div class="text-center text-stone-500 py-8 text-xs font-mono">Memuat log error...</div>
                 </div>
@@ -530,32 +383,20 @@ print(response.json()['result'])</pre>
 
     </div>
 
-    <footer class="text-center text-stone-500 text-xs mt-12 py-4">
-        <%= config.siteName %> &bull; Theme Liquid Glass
-    </footer>
+    <footer class="text-center text-stone-500 text-xs mt-12 py-4"><%= config.siteName %> &bull; Liquid Glass</footer>
 
     <script>
         let currentApiKey = localStorage.getItem('saw_api_key') || '';
-
-        document.addEventListener('DOMContentLoaded', () => {
-            if (currentApiKey) {
-                checkKeyStatus(currentApiKey);
-            }
-        });
+        document.addEventListener('DOMContentLoaded', () => { if (currentApiKey) checkKeyStatus(currentApiKey); });
 
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const backdrop = document.getElementById('sidebar-backdrop');
-            sidebar.classList.toggle('-translate-x-full');
-            backdrop.classList.toggle('hidden');
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            document.getElementById('sidebar-backdrop').classList.toggle('hidden');
         }
 
         function toggleAccordion(name) {
-            const content = document.getElementById(`accordion-content-${name}`);
-            const icon = document.getElementById(`accordion-icon-${name}`);
-            
-            content.classList.toggle('hidden');
-            icon.classList.toggle('rotate-90');
+            document.getElementById(`accordion-content-${name}`).classList.toggle('hidden');
+            document.getElementById(`accordion-icon-${name}`).classList.toggle('rotate-90');
         }
 
         function switchTab(tabName) {
@@ -563,167 +404,92 @@ print(response.json()['result'])</pre>
                 document.getElementById(`tab-${tab}`).classList.add('hidden');
                 document.getElementById(`nav-${tab}`).className = "w-full text-left px-4 py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-3 text-stone-400 hover:bg-stone-800/60 hover:text-white";
             });
-
             document.getElementById(`tab-${tabName}`).classList.remove('hidden');
             document.getElementById(`nav-${tabName}`).className = "w-full text-left px-4 py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-3 bg-amber-500/20 text-amber-300 border border-amber-500/30";
-
             if (tabName === 'logs') fetchErrorLogs();
             toggleSidebar();
         }
 
-        function copyCode(elementId, btnElement) {
-            const codeText = document.getElementById(elementId).innerText;
-            navigator.clipboard.writeText(codeText).then(() => {
-                const originalText = btnElement.innerHTML;
-                btnElement.innerHTML = '<i class="fa-solid fa-check text-emerald-400"></i> Copied!';
-                setTimeout(() => {
-                    btnElement.innerHTML = originalText;
-                }, 2000);
+        function copyCode(id, btn) {
+            navigator.clipboard.writeText(document.getElementById(id).innerText).then(() => {
+                let orig = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check text-emerald-400"></i> Copied!';
+                setTimeout(() => btn.innerHTML = orig, 2000);
             });
         }
 
         async function generateApiKey() {
-            try {
-                const res = await fetch('/api/generate-key', { method: 'POST' });
-                const data = await res.json();
-                if (data.success) {
-                    currentApiKey = data.key;
-                    localStorage.setItem('saw_api_key', data.key);
-                    checkKeyStatus(data.key);
-                    alert('✓ API Key baru berhasil dibuat!');
-                } else {
-                    alert(`✕ ${data.message}`);
-                }
-            } catch (err) {
-                alert('Gagal membuat API Key.');
+            const res = await fetch('/api/generate-key', { method: 'POST' });
+            const data = await res.json();
+            if (data.success) {
+                currentApiKey = data.key;
+                localStorage.setItem('saw_api_key', data.key);
+                checkKeyStatus(data.key);
+                alert('✓ API Key berhasil dibuat!');
             }
         }
 
         async function checkKeyStatus(key) {
-            try {
-                const res = await fetch(`/api/check-key?apikey=${key}`);
-                const data = await res.json();
-                if (data.success) {
-                    document.getElementById('display-key').innerText = data.key;
-                    document.getElementById('stat-used').innerText = data.used;
-                    document.getElementById('stat-remaining').innerText = data.remaining;
-                    document.getElementById('stat-limit').innerText = data.limit;
-
-                    const percent = Math.round((data.used / data.limit) * 100);
-                    document.getElementById('stat-percent').innerText = `${percent}%`;
-                    document.getElementById('limit-progress-bar').style.width = `${percent}%`;
-                }
-            } catch (err) {}
+            const res = await fetch(`/api/check-key?apikey=${key}`);
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('display-key').innerText = data.key;
+                document.getElementById('stat-used').innerText = data.used;
+                document.getElementById('stat-remaining').innerText = data.remaining;
+            }
         }
 
         async function testAiApi() {
-            if (!currentApiKey) {
-                alert('Silakan buat API Key di menu Pengaturan terlebih dahulu!');
-                return;
-            }
-
-            const prompt = document.getElementById('test-prompt-ai').value.trim();
-            if (!prompt) {
-                alert('Masukkan pertanyaan terlebih dahulu!');
-                return;
-            }
-
-            const resultBox = document.getElementById('test-result-box-ai');
-            const resultJson = document.getElementById('test-result-json-ai');
-
-            resultBox.classList.remove('hidden');
-            resultJson.innerText = 'apikeyzenuth AI sedang berpikir...';
-
-            try {
-                const res = await fetch(`/api/ai?apikey=${currentApiKey}&prompt=${encodeURIComponent(prompt)}`);
-                const data = await res.json();
-                resultJson.innerText = JSON.stringify(data, null, 2);
-                checkKeyStatus(currentApiKey);
-            } catch (err) {
-                resultJson.innerText = 'Error: Gagal terhubung ke AI Engine.';
-            }
+            if (!currentApiKey) return alert('Buat API Key dulu di menu Pengaturan!');
+            const prompt = document.getElementById('test-prompt-ai').value;
+            const res = await fetch(`/api/ai?apikey=${currentApiKey}&prompt=${encodeURIComponent(prompt)}`);
+            const data = await res.json();
+            document.getElementById('test-result-box-ai').classList.remove('hidden');
+            document.getElementById('test-result-json-ai').innerText = JSON.stringify(data, null, 2);
+            checkKeyStatus(currentApiKey);
         }
 
         async function testTranslateApi() {
-            if (!currentApiKey) {
-                alert('Silakan buat API Key di menu Pengaturan terlebih dahulu!');
-                return;
-            }
-
-            const text = document.getElementById('test-text-trans').value.trim();
+            if (!currentApiKey) return alert('Buat API Key dulu di menu Pengaturan!');
+            const text = document.getElementById('test-text-trans').value;
             const to = document.getElementById('test-to-trans').value;
-
-            if (!text) {
-                alert('Masukkan teks terjemahan terlebih dahulu!');
-                return;
-            }
-
-            const resultBox = document.getElementById('test-result-box-trans');
-            const resultJson = document.getElementById('test-result-json-trans');
-
-            resultBox.classList.remove('hidden');
-            resultJson.innerText = 'Memproses terjemahan...';
-
-            try {
-                const res = await fetch(`/api/translate?apikey=${currentApiKey}&text=${encodeURIComponent(text)}&to=${encodeURIComponent(to)}`);
-                const data = await res.json();
-                resultJson.innerText = JSON.stringify(data, null, 2);
-                checkKeyStatus(currentApiKey);
-            } catch (err) {
-                resultJson.innerText = 'Error: Gagal terhubung ke Translator Engine.';
-            }
+            const res = await fetch(`/api/translate?apikey=${currentApiKey}&text=${encodeURIComponent(text)}&to=${to}`);
+            const data = await res.json();
+            document.getElementById('test-result-box-trans').classList.remove('hidden');
+            document.getElementById('test-result-json-trans').innerText = JSON.stringify(data, null, 2);
+            checkKeyStatus(currentApiKey);
         }
 
         async function testBypassApi() {
-            if (!currentApiKey) {
-                alert('Silakan buat API Key di menu Pengaturan terlebih dahulu!');
-                return;
-            }
+            if (!currentApiKey) return alert('Buat API Key dulu di menu Pengaturan!');
+            const url = document.getElementById('test-url-bypass').value;
+            const res = await fetch(`/api/bypass?apikey=${currentApiKey}&url=${encodeURIComponent(url)}`);
+            const data = await res.json();
+            document.getElementById('test-result-box-bypass').classList.remove('hidden');
+            document.getElementById('test-result-json-bypass').innerText = JSON.stringify(data, null, 2);
+            checkKeyStatus(currentApiKey);
+        }
 
-            const url = document.getElementById('test-url-bypass').value.trim();
-
-            if (!url) {
-                alert('Masukkan URL shortlink terlebih dahulu!');
-                return;
-            }
-
-            const resultBox = document.getElementById('test-result-box-bypass');
-            const resultJson = document.getElementById('test-result-json-bypass');
-
-            resultBox.classList.remove('hidden');
-            resultJson.innerText = 'Memproses bypass URL...';
-
-            try {
-                const res = await fetch(`/api/bypass?apikey=${currentApiKey}&url=${encodeURIComponent(url)}`);
-                const data = await res.json();
-                resultJson.innerText = JSON.stringify(data, null, 2);
-                checkKeyStatus(currentApiKey);
-            } catch (err) {
-                resultJson.innerText = 'Error: Gagal terhubung ke Bypass Engine.';
-            }
+        async function testCalcApi() {
+            if (!currentApiKey) return alert('Buat API Key dulu di menu Pengaturan!');
+            const a1 = document.getElementById('test-angka1').value;
+            const op = document.getElementById('test-op').value;
+            const a2 = document.getElementById('test-angka2').value;
+            const res = await fetch(`/api/calc?apikey=${currentApiKey}&angka1=${a1}&op=${encodeURIComponent(op)}&angka2=${a2}`);
+            const data = await res.json();
+            document.getElementById('test-result-box-calc').classList.remove('hidden');
+            document.getElementById('test-result-json-calc').innerText = JSON.stringify(data, null, 2);
+            checkKeyStatus(currentApiKey);
         }
 
         async function fetchErrorLogs() {
+            const res = await fetch('/api/logs');
+            const data = await res.json();
             const container = document.getElementById('logs-container');
-            try {
-                const res = await fetch('/api/logs');
-                const data = await res.json();
-
-                if (data.success && data.logs.length > 0) {
-                    container.innerHTML = data.logs.map(log => `
-                        <div class="p-4 rounded-xl bg-stone-950/80 border border-rose-500/20 space-y-1 font-mono text-xs">
-                            <div class="flex items-center justify-between text-stone-400 text-[10px]">
-                                <span class="text-rose-400 font-bold">[${log.statusCode}] ${log.endpoint}</span>
-                                <span>${log.timestamp}</span>
-                            </div>
-                            <p class="text-stone-200">${log.message}</p>
-                        </div>
-                    `).join('');
-                } else {
-                    container.innerHTML = `<div class="text-center text-stone-500 py-8 text-xs font-mono">✓ Belum ada error tercatat. Server berjalan lancar!</div>`;
-                }
-            } catch (err) {
-                container.innerHTML = `<div class="text-center text-rose-400 py-8 text-xs">Gagal mengambil daftar log error.</div>`;
+            if (data.success && data.logs.length > 0) {
+                container.innerHTML = data.logs.map(l => `<div class="p-3 bg-stone-950 rounded-xl border border-rose-500/20 text-xs font-mono"><span class="text-rose-400">[${l.statusCode}] ${l.endpoint}</span> - ${l.message}</div>`).join('');
+            } else {
+                container.innerHTML = `<div class="text-center text-stone-500 py-6 text-xs font-mono">✓ Belum ada error tercatat.</div>`;
             }
         }
     </script>
