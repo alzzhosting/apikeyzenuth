@@ -6,34 +6,26 @@ const crypto = require('crypto');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Penanganan lokasi database sementara di Vercel Serverless
 const DB_FILE = process.env.VERCEL 
     ? path.join('/tmp', 'database.json') 
     : path.join(__dirname, 'database.json');
 
 let memoryDB = { keys: {} };
 
-// 1. PENGATURAN TERPUSAT APLIKASI
 const SITE_CONFIG = {
-    siteName: 'apikeyzenuth',               // Nama resmi proyek terbaru
+    siteName: 'apikeyzenuth',
     aiName: 'apikeyzenuth AI',
     themeName: 'Liquid Glass Platform',
-    defaultLimit: 100,                      // Batas limit per 24 jam
-    resetWindowMs: 24 * 60 * 60 * 1000,      // Durasi 24 jam
-    maxLogsToKeep: 50                       // Batas simpan log error
+    defaultLimit: 100,
+    resetWindowMs: 24 * 60 * 60 * 1000,
+    maxLogsToKeep: 50
 };
 
-// API Key Google Gemini untuk Endpoint AI
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AQ.Ab8RN6L3iwvouEq-l5shid2D11Y6XAPKzBn_mOT7QrEubSYJog';
-
-// Key khusus untuk API Bypass Zennq
 const ZENNQ_API_KEY = 'zq_eu1maz2hkr3uv319ffp2jl0shohwj2lt';
 
 const errorLogs = [];
 
-/**
- * Fungsi untuk mencatat riwayat error ke sistem log
- */
 function recordErrorLog(endpoint, message, statusCode = 400) {
     const newLog = {
         id: 'LOG-' + Date.now().toString(36).toUpperCase(),
@@ -49,15 +41,11 @@ function recordErrorLog(endpoint, message, statusCode = 400) {
     }
 }
 
-// Middleware Express
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-/**
- * Memuat database JSON lokal/sementara
- */
 function loadDB() {
     try {
         if (!fs.existsSync(DB_FILE)) {
@@ -71,21 +59,13 @@ function loadDB() {
     }
 }
 
-/**
- * Menyimpan data ke file/memori
- */
 function saveDB(data) {
     memoryDB = data;
     try {
         fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
-    } catch (err) {
-        // Fallback simpan di memori
-    }
+    } catch (err) {}
 }
 
-/**
- * Middleware Rate Limiter & Auto Recovery Key
- */
 function checkRateLimit(req, res, next) {
     const apiKey = req.query.apikey || req.body.apikey;
 
@@ -97,7 +77,6 @@ function checkRateLimit(req, res, next) {
     const db = loadDB();
     let keyData = db.keys[apiKey];
 
-    // Pemulihan otomatis jika key SAW- terhapus akibat cold start Vercel
     if (!keyData && apiKey.startsWith('SAW-')) {
         keyData = {
             key: apiKey,
@@ -137,8 +116,6 @@ function checkRateLimit(req, res, next) {
     req.keyInfo = keyData;
     next();
 }
-
-// 2. ROUTE DAN API ENDPOINTS
 
 app.get('/', (req, res) => {
     res.render('docs', { config: SITE_CONFIG });
@@ -202,10 +179,9 @@ app.get('/api/check-key', (req, res) => {
     });
 });
 
-// Endpoint 1: apikeyzenuth AI Prompt
+// Endpoint 1: AI Prompt
 app.get('/api/ai', checkRateLimit, async (req, res) => {
     const prompt = req.query.prompt;
-
     if (!prompt || prompt.trim() === '') {
         recordErrorLog(req.originalUrl, 'Parameter prompt kosong', 400);
         return res.status(400).json({ success: false, message: 'Parameter prompt tidak boleh kosong!' });
@@ -213,15 +189,11 @@ app.get('/api/ai', checkRateLimit, async (req, res) => {
 
     try {
         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-        
         const response = await fetch(geminiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }]
-            })
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
         });
-
         const data = await response.json();
 
         if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
@@ -230,57 +202,44 @@ app.get('/api/ai', checkRateLimit, async (req, res) => {
                 author: SITE_CONFIG.siteName,
                 prompt: prompt,
                 result: data.candidates[0].content.parts[0].text,
-                usage: {
-                    usedToday: req.keyInfo.count,
-                    remaining: req.keyInfo.limit - req.keyInfo.count,
-                    limit: req.keyInfo.limit
-                }
+                usage: { usedToday: req.keyInfo.count, remaining: req.keyInfo.limit - req.keyInfo.count, limit: req.keyInfo.limit }
             });
         } else {
-            const errMsg = data.error ? data.error.message : 'Respons dari AI tidak valid.';
+            const errMsg = data.error ? data.error.message : 'Respons AI tidak valid.';
             recordErrorLog(req.originalUrl, errMsg, 500);
-            return res.status(500).json({ success: false, author: SITE_CONFIG.siteName, message: `Gagal memproses AI: ${errMsg}` });
+            return res.status(500).json({ success: false, message: `Gagal memproses AI: ${errMsg}` });
         }
     } catch (err) {
         recordErrorLog(req.originalUrl, err.message, 500);
-        return res.status(500).json({ success: false, author: SITE_CONFIG.siteName, message: `Gagal memproses AI: ${err.message}` });
+        return res.status(500).json({ success: false, message: `Gagal memproses AI: ${err.message}` });
     }
 });
 
-// Endpoint 2: Fast Translate (Google Translate GTX API)
+// Endpoint 2: Fast Translate
 app.get('/api/translate', checkRateLimit, async (req, res) => {
     const { text, to } = req.query;
-
     if (!text || text.trim() === '') {
-        recordErrorLog(req.originalUrl, 'Parameter text kosong pada translator', 400);
+        recordErrorLog(req.originalUrl, 'Parameter text kosong', 400);
         return res.status(400).json({ success: false, message: 'Parameter text tidak boleh kosong!' });
     }
-
     const targetLang = to || 'en';
-
     try {
         const gtxUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${encodeURIComponent(targetLang)}&dt=t&q=${encodeURIComponent(text)}`;
-
         const response = await fetch(gtxUrl);
         const data = await response.json();
 
         if (data && data[0]) {
             const translatedText = data[0].map(item => item[0]).filter(Boolean).join('');
-
             return res.json({
                 success: true,
                 author: SITE_CONFIG.siteName,
                 originalText: text,
                 targetLanguage: targetLang,
                 result: translatedText,
-                usage: {
-                    usedToday: req.keyInfo.count,
-                    remaining: req.keyInfo.limit - req.keyInfo.count,
-                    limit: req.keyInfo.limit
-                }
+                usage: { usedToday: req.keyInfo.count, remaining: req.keyInfo.limit - req.keyInfo.count, limit: req.keyInfo.limit }
             });
         } else {
-            recordErrorLog(req.originalUrl, 'Gagal mengambil data dari Google Translate GTX', 500);
+            recordErrorLog(req.originalUrl, 'Gagal mengambil data translator', 500);
             return res.status(500).json({ success: false, message: 'Gagal memproses terjemahan.' });
         }
     } catch (err) {
@@ -289,25 +248,20 @@ app.get('/api/translate', checkRateLimit, async (req, res) => {
     }
 });
 
-// Endpoint 3: Shortlink Bypass (/api/bypass)
+// Endpoint 3: Shortlink Bypass
 app.get('/api/bypass', checkRateLimit, async (req, res) => {
     const targetUrl = req.query.url;
-
     if (!targetUrl || targetUrl.trim() === '') {
-        recordErrorLog(req.originalUrl, 'Parameter url kosong pada bypass', 400);
+        recordErrorLog(req.originalUrl, 'Parameter url kosong', 400);
         return res.status(400).json({ success: false, message: 'Parameter url tidak boleh kosong!' });
     }
 
     try {
         const bypassResponse = await fetch('https://zennq.my.id/api/bypass', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-api-key': ZENNQ_API_KEY
-            },
+            headers: { 'Content-Type': 'application/json', 'x-api-key': ZENNQ_API_KEY },
             body: JSON.stringify({ url: targetUrl })
         });
-
         const data = await bypassResponse.json();
 
         if (data && data.data && data.data.bypassedUrl) {
@@ -316,21 +270,80 @@ app.get('/api/bypass', checkRateLimit, async (req, res) => {
                 author: SITE_CONFIG.siteName,
                 originalUrl: targetUrl,
                 result: data.data.bypassedUrl,
-                usage: {
-                    usedToday: req.keyInfo.count,
-                    remaining: req.keyInfo.limit - req.keyInfo.count,
-                    limit: req.keyInfo.limit
-                }
+                usage: { usedToday: req.keyInfo.count, remaining: req.keyInfo.limit - req.keyInfo.count, limit: req.keyInfo.limit }
             });
         } else {
-            const errMsg = data.message || 'Gagal melewati shortlink yang diberikan.';
-            recordErrorLog(req.originalUrl, `Bypass API error: ${errMsg}`, 500);
+            const errMsg = data.message || 'Gagal melewati shortlink.';
+            recordErrorLog(req.originalUrl, errMsg, 500);
             return res.status(500).json({ success: false, message: `Gagal bypass URL: ${errMsg}` });
         }
     } catch (err) {
         recordErrorLog(req.originalUrl, err.message, 500);
         return res.status(500).json({ success: false, message: `Gagal memproses bypass: ${err.message}` });
     }
+});
+
+// Endpoint 4: API Kalkulator (/api/calc)
+app.get('/api/calc', checkRateLimit, (req, res) => {
+    let { angka1, op, angka2 } = req.query;
+
+    if (angka1 === undefined || op === undefined || angka2 === undefined) {
+        recordErrorLog(req.originalUrl, 'Parameter kalkulator tidak lengkap', 400);
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Parameter angka1, op (+, -, x, :), dan angka2 wajib diisi!' 
+        });
+    }
+
+    const num1 = parseFloat(angka1);
+    const num2 = parseFloat(angka2);
+
+    if (isNaN(num1) || isNaN(num2)) {
+        recordErrorLog(req.originalUrl, 'Format angka kalkulator tidak valid', 400);
+        return res.status(400).json({ success: false, message: 'angka1 dan angka2 harus berupa angka yang valid!' });
+    }
+
+    let hasil = 0;
+
+    switch (op) {
+        case '+':
+            hasil = num1 + num2;
+            break;
+        case '-':
+            hasil = num1 - num2;
+            break;
+        case 'x':
+        case 'X':
+        case '*':
+            hasil = num1 * num2;
+            break;
+        case ':':
+        case '/':
+            if (num2 === 0) {
+                recordErrorLog(req.originalUrl, 'Pembagian dengan nol', 400);
+                return res.status(400).json({ success: false, message: 'Kesalahan: Tidak dapat membagi angka dengan nol (0)!' });
+            }
+            hasil = num1 / num2;
+            break;
+        default:
+            recordErrorLog(req.originalUrl, `Operator tidak dikenal: ${op}`, 400);
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Operator tidak valid! Gunakan "+" (tambah), "-" (kurang), "x" (kali), atau ":" (bagi).' 
+            });
+    }
+
+    return res.json({
+        success: true,
+        author: SITE_CONFIG.siteName,
+        operasi: `${num1} ${op} ${num2}`,
+        result: hasil,
+        usage: {
+            usedToday: req.keyInfo.count,
+            remaining: req.keyInfo.limit - req.keyInfo.count,
+            limit: req.keyInfo.limit
+        }
+    });
 });
 
 app.get('/api/logs', (req, res) => {
