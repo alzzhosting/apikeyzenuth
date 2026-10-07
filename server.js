@@ -231,20 +231,43 @@ app.get('/api/translate', checkRateLimit, async (req, res) => {
     }
 });
 
-// Endpoint Bypass
+// Endpoint Bypass (Diperbarui agar menangkap pesan error detail dari server Zennq)
 app.get('/api/bypass', checkRateLimit, async (req, res) => {
-    const url = req.query.url;
-    if (!url) return res.status(400).json({ success: false, message: 'Parameter url wajib diisi.' });
+    const targetUrl = req.query.url;
+    if (!targetUrl || targetUrl.trim() === '') {
+        recordErrorLog(req.originalUrl, 'Parameter url kosong', 400);
+        return res.status(400).json({ success: false, message: 'Parameter url tidak boleh kosong!' });
+    }
+
     try {
-        const response = await fetch('https://zennq.my.id/api/bypass', {
+        const bypassResponse = await fetch('https://zennq.my.id/api/bypass', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'x-api-key': ZENNQ_API_KEY },
-            body: JSON.stringify({ url })
+            body: JSON.stringify({ url: targetUrl })
         });
-        const data = await response.json();
-        return res.json({ success: true, result: data.data?.bypassedUrl || 'Gagal bypass' });
+        const data = await bypassResponse.json();
+
+        if (data && data.data && data.data.bypassedUrl) {
+            return res.json({
+                success: true,
+                author: SITE_CONFIG.siteName,
+                originalUrl: targetUrl,
+                result: data.data.bypassedUrl,
+                usage: { usedToday: req.keyInfo.count, remaining: req.keyInfo.limit - req.keyInfo.count, limit: req.keyInfo.limit }
+            });
+        } else {
+            // Menampilkan pesan error asli dari server zennq jika ada
+            const serverMessage = data.message || data.error || 'Gagal melewati shortlink atau format URL tidak didukung.';
+            recordErrorLog(req.originalUrl, serverMessage, 400);
+            return res.status(400).json({ 
+                success: false, 
+                message: serverMessage,
+                rawResponse: data 
+            });
+        }
     } catch (err) {
-        return res.status(500).json({ success: false, message: err.message });
+        recordErrorLog(req.originalUrl, err.message, 500);
+        return res.status(500).json({ success: false, message: `Gagal memproses bypass: ${err.message}` });
     }
 });
 
@@ -307,7 +330,7 @@ app.get('/api/story', checkRateLimit, async (req, res) => {
     }
 });
 
-// Endpoint Character Story (CS SA-MP) Sesuai Gambar Referensi
+// Endpoint Character Story (CS SA-MP)
 app.get('/api/character-story', checkRateLimit, async (req, res) => {
     const { nama, tanggalLahir, asal, catatan, latarBelakang, vibe, bahasa, paragraf } = req.query;
 
@@ -319,7 +342,7 @@ app.get('/api/character-story', checkRateLimit, async (req, res) => {
         });
     }
 
-    const prompt = `Buatkan sebuah Character Story (CS) Roleplay SA-MP yang sangat imersif, mendalam, dan sesuai standar server roleplay berkualitas tinggi berdasarkan detail berikut:
+    const prompt = `Buatkan sebuah Character Story (CS) Roleplay SA-MP yang sangat imersif berdasarkan detail berikut:
 - Nama Karakter (IC): ${nama}
 - Tahun / Tanggal Lahir: ${tanggalLahir}
 - Asal / Kewarganegaraan: ${asal}
@@ -327,9 +350,7 @@ app.get('/api/character-story', checkRateLimit, async (req, res) => {
 - Vibe Kepribadian: ${vibe || 'Netral'}
 - Bahasa Cerita: ${bahasa || 'Indonesia'}
 - Jumlah Paragraf: ${paragraf || '4 Paragraf'}
-- Catatan Tambahan / Alur Khusus: ${catatan || 'Tidak ada catatan khusus, kembangkan secara kreatif.'}
-
-Pastikan struktur cerita rapi sesuai jumlah paragraf yang diminta.`;
+- Catatan Tambahan: ${catatan || 'Tidak ada catatan khusus.'}`;
 
     try {
         const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -340,9 +361,7 @@ Pastikan struktur cerita rapi sesuai jumlah paragraf yang diminta.`;
                 model: 'openai/gpt-oss-120b',
                 temperature: 1,
                 max_completion_tokens: 3000,
-                top_p: 1,
-                stream: false,
-                reasoning_effort: 'medium'
+                stream: false
             })
         });
 
@@ -352,17 +371,13 @@ Pastikan struktur cerita rapi sesuai jumlah paragraf yang diminta.`;
             return res.json({
                 success: true,
                 author: SITE_CONFIG.siteName,
-                characterDetails: { nama, tanggalLahir, asal, latarBelakang, vibe, bahasa, paragraf, catatan },
                 result: data.choices[0].message.content.trim(),
                 usage: { usedToday: req.keyInfo.count, remaining: req.keyInfo.limit - req.keyInfo.count, limit: req.keyInfo.limit }
             });
         } else {
-            const errMsg = data.error ? data.error.message : 'Gagal menghasilkan Character Story.';
-            recordErrorLog(req.originalUrl, errMsg, 500);
-            return res.status(500).json({ success: false, message: errMsg });
+            return res.status(500).json({ success: false, message: 'Gagal menghasilkan Character Story.' });
         }
     } catch (err) {
-        recordErrorLog(req.originalUrl, err.message, 500);
         return res.status(500).json({ success: false, message: err.message });
     }
 });
@@ -372,9 +387,7 @@ app.get('/api/logs', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`=================================================`);
-    console.log(`${SITE_CONFIG.siteName} Aktif di: http://localhost:${PORT}`);
-    console.log(`=================================================`);
+    console.log(`Server aktif di port ${PORT}`);
 });
 
 module.exports = app;
