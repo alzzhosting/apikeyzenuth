@@ -22,7 +22,7 @@ const SITE_CONFIG = {
 };
 
 const GROQ_API_KEY = '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';
-const ZENNQ_API_KEY = 'zq_eu1maz2hkr3uv319ffp2jl0shohwj2lt';
+const ZENNQ_API_KEY = 'zq_s3utsc8yfqw2ung1w8rybkqxr9fl1gcb';
 
 const errorLogs = [];
 
